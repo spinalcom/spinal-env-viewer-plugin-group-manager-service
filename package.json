@@ -1,0 +1,20 @@
+{
+  "name": "spinal-env-viewer-plugin-group-manager-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rm -fr dist && tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "spinal-env-viewer-graph-service": "git+https://github.com/spinalcom/Spinal-Graph-Service.git"
+  },
+  "devDependencies": {
+    "ts-loader": "^5.4.3",
+    "typescript": "^3.4.5"
+  }
+}
