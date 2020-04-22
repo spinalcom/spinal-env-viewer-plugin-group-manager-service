@@ -23,7 +23,10 @@
  */
 
 
-import { SpinalGraphService } from "spinal-env-viewer-graph-service";
+import { SpinalGraphService, SpinalContext } from "spinal-env-viewer-graph-service";
+
+import { Model } from 'spinal-core-connectorjs_type';
+
 
 import SpinalGroup from "./SpinalGroup";
 import SpinalCategory from "./SpinalCategory";
@@ -46,18 +49,16 @@ export default class GroupManagerService {
         this.spinalCategory = new SpinalCategory();
     }
 
-    public createGroupContext(contextName: string, childrenType: string): Promise<boolean> {
+    public createGroupContext(contextName: string, childrenType: string): Promise<any> {
         const contextFound = SpinalGraphService.getContext(contextName);
 
-        if (typeof contextFound !== "undefined") return Promise.resolve(false);
+        if (typeof contextFound !== "undefined") return Promise.resolve(contextFound);
 
         return SpinalGraphService.addContext(contextName, `${childrenType}GroupContext`,
-            new spinal.Model({
+            new Model({
                 name: contextName,
                 childType: childrenType
-            })).then(spinalContext => {
-                return spinalContext ? true : false
-            })
+            }))
 
     }
 

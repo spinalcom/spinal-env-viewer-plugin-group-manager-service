@@ -25,6 +25,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
 const constants_1 = require("./constants");
+const spinal_core_connectorjs_type_1 = require("spinal-core-connectorjs_type");
 class SpinalCategory {
     constructor() {
         this.CATEGORY_TYPE = constants_1.CATEGORY_TYPE;
@@ -36,7 +37,7 @@ class SpinalCategory {
             type: this.CATEGORY_TYPE,
             icon: iconName
         };
-        let childId = spinal_env_viewer_graph_service_1.SpinalGraphService.createNode(info, new spinal.Model({
+        let childId = spinal_env_viewer_graph_service_1.SpinalGraphService.createNode(info, new spinal_core_connectorjs_type_1.Model({
             name: categoryName
         }));
         return spinal_env_viewer_graph_service_1.SpinalGraphService.addChildInContext(contextId, childId, contextId, this.CONTEXT_TO_CATEGORY_RELATION, spinal_env_viewer_graph_service_1.SPINAL_RELATION_PTR_LST_TYPE);

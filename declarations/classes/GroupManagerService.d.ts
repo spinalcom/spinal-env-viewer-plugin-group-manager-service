@@ -2,7 +2,7 @@ export default class GroupManagerService {
     private spinalGroup;
     private spinalCategory;
     constructor();
-    createGroupContext(contextName: string, childrenType: string): Promise<boolean>;
+    createGroupContext(contextName: string, childrenType: string): Promise<any>;
     getGroupĈontexts(contextType?: string): Promise<any>;
     addCategory(contextId: string, categoryName: string, iconName: string): Promise<any>;
     getCategories(nodeId: string): Promise<any>;

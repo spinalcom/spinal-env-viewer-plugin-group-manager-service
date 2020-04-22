@@ -27,6 +27,8 @@ import { SpinalGraphService, SPINAL_RELATION_PTR_LST_TYPE } from "spinal-env-vie
 
 import { CATEGORY_TYPE, CONTEXT_TO_CATEGORY_RELATION, CATEGORY_TO_GROUP_RELATION } from "./constants";
 
+import { Model } from 'spinal-core-connectorjs_type';
+
 export default class SpinalCategory {
 
     CATEGORY_TYPE: string = CATEGORY_TYPE;
@@ -42,7 +44,7 @@ export default class SpinalCategory {
             icon: iconName
         }
 
-        let childId = SpinalGraphService.createNode(info, new spinal.Model({
+        let childId = SpinalGraphService.createNode(info, new Model({
             name: categoryName
         }))
 

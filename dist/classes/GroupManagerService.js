@@ -24,6 +24,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
+const spinal_core_connectorjs_type_1 = require("spinal-core-connectorjs_type");
 const SpinalGroup_1 = require("./SpinalGroup");
 const SpinalCategory_1 = require("./SpinalCategory");
 class GroupManagerService {
@@ -34,13 +35,11 @@ class GroupManagerService {
     createGroupContext(contextName, childrenType) {
         const contextFound = spinal_env_viewer_graph_service_1.SpinalGraphService.getContext(contextName);
         if (typeof contextFound !== "undefined")
-            return Promise.resolve(false);
-        return spinal_env_viewer_graph_service_1.SpinalGraphService.addContext(contextName, `${childrenType}GroupContext`, new spinal.Model({
+            return Promise.resolve(contextFound);
+        return spinal_env_viewer_graph_service_1.SpinalGraphService.addContext(contextName, `${childrenType}GroupContext`, new spinal_core_connectorjs_type_1.Model({
             name: contextName,
             childType: childrenType
-        })).then(spinalContext => {
-            return spinalContext ? true : false;
-        });
+        }));
     }
     getGroupĈontexts(contextType) {
         let graphId = spinal_env_viewer_graph_service_1.SpinalGraphService.getGraph().getId().get();

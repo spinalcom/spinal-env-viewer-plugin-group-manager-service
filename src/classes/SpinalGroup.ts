@@ -28,6 +28,9 @@ import { SpinalGraphService, SPINAL_RELATION_PTR_LST_TYPE, SPINAL_RELATION_LST_P
 
 import { CATEGORY_TO_GROUP_RELATION, CONTEXT_TO_CATEGORY_RELATION } from "./constants";
 
+import { Model } from 'spinal-core-connectorjs_type';
+
+
 export default class SpinalGroup {
 
     CATEGORY_TO_GROUP_RELATION: string = CATEGORY_TO_GROUP_RELATION;
@@ -47,7 +50,7 @@ export default class SpinalGroup {
                 color: groupColor ? groupColor : "#000000"
             }
 
-            let childId = SpinalGraphService.createNode(info, new spinal.Model({
+            let childId = SpinalGraphService.createNode(info, new Model({
                 name: groupName
             }))
 
