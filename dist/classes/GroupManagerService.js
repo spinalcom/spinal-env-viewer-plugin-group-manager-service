@@ -82,6 +82,15 @@ class GroupManagerService {
     getElementsLinkedToGroup(groupId) {
         return this.spinalGroup.getElementsLinkedToGroup(groupId);
     }
+    isCategory(type) {
+        return this.spinalCategory._isCategory(type);
+    }
+    isGroup(type) {
+        return this.spinalGroup._isGroup(type);
+    }
+    getGroupCategory(groupId) {
+        return this.spinalGroup.getCategory(groupId);
+    }
 }
 exports.default = GroupManagerService;
 //# sourceMappingURL=GroupManagerService.js.map

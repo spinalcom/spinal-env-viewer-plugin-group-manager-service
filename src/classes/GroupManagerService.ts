@@ -110,13 +110,24 @@ export default class GroupManagerService {
         return this.spinalCategory.elementIsInCategorie(categoryId, elementId);
     }
 
-
     public unLinkElementToGroup(groupId: string, elementId: string): Promise<any> {
         return this.spinalGroup.unLinkElementToGroup(groupId, elementId);
     }
 
     public getElementsLinkedToGroup(groupId: string): Promise<any> {
         return this.spinalGroup.getElementsLinkedToGroup(groupId);
+    }
+
+    public isCategory(type: string): boolean {
+        return this.spinalCategory._isCategory(type);
+    }
+
+    public isGroup(type: string): boolean {
+        return this.spinalGroup._isGroup(type);
+    }
+
+    public getGroupCategory(groupId: string): Promise<any> {
+        return this.spinalGroup.getCategory(groupId);
     }
 
 }

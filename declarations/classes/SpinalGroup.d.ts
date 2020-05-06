@@ -7,6 +7,7 @@ export default class SpinalGroup {
     unLinkElementToGroup(groupId: string, elementId: string): Promise<any>;
     getElementsLinkedToGroup(groupId: string): Promise<any>;
     getGroups(nodeId: string): Promise<any>;
+    getCategory(groupId: string): Promise<any>;
     private _getChildrenType;
-    private _isGroup;
+    _isGroup(type: string): boolean;
 }

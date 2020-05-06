@@ -22,6 +22,15 @@
  * with this file. If not, see
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
 const constants_1 = require("./constants");
@@ -88,6 +97,13 @@ class SpinalGroup {
                 spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(el);
                 return el.info;
             });
+        });
+    }
+    getCategory(groupId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const parents = yield spinal_env_viewer_graph_service_1.SpinalGraphService.getParents(groupId, [this.CATEGORY_TO_GROUP_RELATION]);
+            if (parents.length > 0)
+                return parents[0];
         });
     }
     ////////////////////////////////////////////////////////////////////

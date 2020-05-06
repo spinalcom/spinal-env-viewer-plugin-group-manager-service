@@ -130,6 +130,11 @@ export default class SpinalGroup {
 
     }
 
+    public async getCategory(groupId: string): Promise<any> {
+        const parents = await SpinalGraphService.getParents(groupId, [this.CATEGORY_TO_GROUP_RELATION]);
+        if (parents.length > 0) return parents[0];
+    }
+
 
     ////////////////////////////////////////////////////////////////////
     //                      PRIVATES                                  //
@@ -141,7 +146,7 @@ export default class SpinalGroup {
     }
 
 
-    private _isGroup(type: string) {
+    public _isGroup(type: string) {
         let stringEnd = type.substr(type.length - 5);
 
         return stringEnd === "Group";

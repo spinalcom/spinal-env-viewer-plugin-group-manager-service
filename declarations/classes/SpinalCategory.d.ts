@@ -5,7 +5,7 @@ export default class SpinalCategory {
     addCategory(contextId: string, categoryName: string, iconName: string): Promise<any>;
     getCategories(nodeId: string): Promise<any>;
     elementIsInCategorie(categoryId: string, elementId: string): Promise<Boolean>;
-    private _isCategory;
+    _isCategory(type: string): any;
     private _isContext;
     private _getRelationRefs;
 }

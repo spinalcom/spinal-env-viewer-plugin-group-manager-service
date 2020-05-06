@@ -13,4 +13,7 @@ export default class GroupManagerService {
     elementIsInCategorie(categoryId: string, elementId: string): Promise<Boolean>;
     unLinkElementToGroup(groupId: string, elementId: string): Promise<any>;
     getElementsLinkedToGroup(groupId: string): Promise<any>;
+    isCategory(type: string): boolean;
+    isGroup(type: string): boolean;
+    getGroupCategory(groupId: string): Promise<any>;
 }

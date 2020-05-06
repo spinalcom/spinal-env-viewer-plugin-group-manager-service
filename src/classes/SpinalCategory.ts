@@ -101,7 +101,7 @@ export default class SpinalCategory {
     //                      PRIVATES                                  //
     ////////////////////////////////////////////////////////////////////
 
-    private _isCategory(type: string): any {
+    public _isCategory(type: string): any {
         return type === this.CATEGORY_TYPE;
     }
 
