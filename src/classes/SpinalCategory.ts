@@ -37,7 +37,14 @@ export default class SpinalCategory {
     constructor() { }
 
 
-    public addCategory(contextId: string, categoryName: string, iconName: string): Promise<any> {
+    public async addCategory(contextId: string, categoryName: string, iconName: string): Promise<any> {
+
+        const categoryFound = await this._categoryNameExist(contextId, categoryName);
+
+        if (categoryFound) {
+            return SpinalGraphService.getRealNode(categoryFound.id.get());
+        }
+
         let info = {
             name: categoryName,
             type: this.CATEGORY_TYPE,
@@ -125,6 +132,17 @@ export default class SpinalCategory {
         }
 
         return Promise.all(relationRefPromises)
+    }
+
+    private async _categoryNameExist(nodeId: string, categoryName: string) {
+        const categories = await this.getCategories(nodeId);
+
+        for (const category of categories) {
+            const name = category.name.get();
+            if (name === categoryName) return category;
+        }
+
+        return;
     }
 
 }

@@ -22,6 +22,15 @@
  * with this file. If not, see
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
 const constants_1 = require("./constants");
@@ -32,15 +41,21 @@ class SpinalCategory {
         this.CONTEXT_TO_CATEGORY_RELATION = constants_1.CONTEXT_TO_CATEGORY_RELATION;
     }
     addCategory(contextId, categoryName, iconName) {
-        let info = {
-            name: categoryName,
-            type: this.CATEGORY_TYPE,
-            icon: iconName
-        };
-        let childId = spinal_env_viewer_graph_service_1.SpinalGraphService.createNode(info, new spinal_core_connectorjs_type_1.Model({
-            name: categoryName
-        }));
-        return spinal_env_viewer_graph_service_1.SpinalGraphService.addChildInContext(contextId, childId, contextId, this.CONTEXT_TO_CATEGORY_RELATION, spinal_env_viewer_graph_service_1.SPINAL_RELATION_PTR_LST_TYPE);
+        return __awaiter(this, void 0, void 0, function* () {
+            const categoryFound = yield this._categoryNameExist(contextId, categoryName);
+            if (categoryFound) {
+                return spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(categoryFound.id.get());
+            }
+            let info = {
+                name: categoryName,
+                type: this.CATEGORY_TYPE,
+                icon: iconName
+            };
+            let childId = spinal_env_viewer_graph_service_1.SpinalGraphService.createNode(info, new spinal_core_connectorjs_type_1.Model({
+                name: categoryName
+            }));
+            return spinal_env_viewer_graph_service_1.SpinalGraphService.addChildInContext(contextId, childId, contextId, this.CONTEXT_TO_CATEGORY_RELATION, spinal_env_viewer_graph_service_1.SPINAL_RELATION_PTR_LST_TYPE);
+        });
     }
     getCategories(nodeId) {
         let nodeInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(nodeId);
@@ -93,6 +108,17 @@ class SpinalCategory {
             }
         }
         return Promise.all(relationRefPromises);
+    }
+    _categoryNameExist(nodeId, categoryName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const categories = yield this.getCategories(nodeId);
+            for (const category of categories) {
+                const name = category.name.get();
+                if (name === categoryName)
+                    return category;
+            }
+            return;
+        });
     }
 }
 exports.default = SpinalCategory;

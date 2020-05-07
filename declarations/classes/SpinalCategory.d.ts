@@ -8,4 +8,5 @@ export default class SpinalCategory {
     _isCategory(type: string): any;
     private _isContext;
     private _getRelationRefs;
+    private _categoryNameExist;
 }

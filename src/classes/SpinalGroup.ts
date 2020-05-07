@@ -39,7 +39,14 @@ export default class SpinalGroup {
     constructor() { }
 
 
-    public addGroup(contextId: string, categoryId: string, groupName: string, groupColor: string): Promise<any> {
+    public async addGroup(contextId: string, categoryId: string, groupName: string, groupColor: string): Promise<any> {
+
+
+        const groupFound = await this._groupNameExist(categoryId, groupName);
+
+        if (groupFound) {
+            return SpinalGraphService.getRealNode(groupFound.id.get());
+        }
 
         let contextInfo = SpinalGraphService.getInfo(contextId);
 
@@ -152,6 +159,16 @@ export default class SpinalGroup {
         return stringEnd === "Group";
     }
 
+    private async _groupNameExist(nodeId: string, groupName: string) {
+        const groups = await this.getGroups(nodeId);
+
+        for (const group of groups) {
+            const name = group.name.get();
+            if (name === groupName) return group;
+        }
+
+        return;
+    }
 
 
 

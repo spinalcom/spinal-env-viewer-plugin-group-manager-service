@@ -40,19 +40,25 @@ class SpinalGroup {
         this.CATEGORY_TO_GROUP_RELATION = constants_1.CATEGORY_TO_GROUP_RELATION;
     }
     addGroup(contextId, categoryId, groupName, groupColor) {
-        let contextInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(contextId);
-        if (contextInfo) {
-            let info = {
-                name: groupName,
-                type: `${this._getChildrenType(contextInfo.type.get())}Group`,
-                color: groupColor ? groupColor : "#000000"
-            };
-            let childId = spinal_env_viewer_graph_service_1.SpinalGraphService.createNode(info, new spinal_core_connectorjs_type_1.Model({
-                name: groupName
-            }));
-            return spinal_env_viewer_graph_service_1.SpinalGraphService.addChildInContext(categoryId, childId, contextId, this.CATEGORY_TO_GROUP_RELATION, spinal_env_viewer_graph_service_1.SPINAL_RELATION_PTR_LST_TYPE);
-        }
-        return Promise.resolve(false);
+        return __awaiter(this, void 0, void 0, function* () {
+            const groupFound = yield this._groupNameExist(categoryId, groupName);
+            if (groupFound) {
+                return spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(groupFound.id.get());
+            }
+            let contextInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(contextId);
+            if (contextInfo) {
+                let info = {
+                    name: groupName,
+                    type: `${this._getChildrenType(contextInfo.type.get())}Group`,
+                    color: groupColor ? groupColor : "#000000"
+                };
+                let childId = spinal_env_viewer_graph_service_1.SpinalGraphService.createNode(info, new spinal_core_connectorjs_type_1.Model({
+                    name: groupName
+                }));
+                return spinal_env_viewer_graph_service_1.SpinalGraphService.addChildInContext(categoryId, childId, contextId, this.CATEGORY_TO_GROUP_RELATION, spinal_env_viewer_graph_service_1.SPINAL_RELATION_PTR_LST_TYPE);
+            }
+            return Promise.resolve(false);
+        });
     }
     linkElementToGroup(contextId, groupId, elementId) {
         let groupInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(groupId);
@@ -115,6 +121,17 @@ class SpinalGroup {
     _isGroup(type) {
         let stringEnd = type.substr(type.length - 5);
         return stringEnd === "Group";
+    }
+    _groupNameExist(nodeId, groupName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const groups = yield this.getGroups(nodeId);
+            for (const group of groups) {
+                const name = group.name.get();
+                if (name === groupName)
+                    return group;
+            }
+            return;
+        });
     }
 }
 exports.default = SpinalGroup;
