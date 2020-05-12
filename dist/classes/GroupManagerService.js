@@ -41,17 +41,17 @@ class GroupManagerService {
             childType: childrenType
         }));
     }
-    getGroupĈontexts(contextType) {
+    getGroupĈontexts(childType) {
         let graphId = spinal_env_viewer_graph_service_1.SpinalGraphService.getGraph().getId().get();
         return spinal_env_viewer_graph_service_1.SpinalGraphService.getChildren(graphId).then(contextsModel => {
             let contexts = contextsModel.map(el => el.get());
             let allGroupContexts = contexts.filter(el => {
                 return el.type.includes("GroupContext");
             });
-            if (typeof contextType === "undefined")
+            if (typeof childType === "undefined")
                 return allGroupContexts;
             return allGroupContexts.filter(el => {
-                return el.type.includes(contextType);
+                return el.type.includes(childType);
             });
         });
     }

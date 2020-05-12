@@ -62,7 +62,8 @@ export default class GroupManagerService {
 
     }
 
-    public getGroupĈontexts(contextType?: string): Promise<any> {
+    public getGroupĈontexts(childType?: string): Promise<any> {
+
         let graphId = SpinalGraphService.getGraph().getId().get();
 
         return SpinalGraphService.getChildren(graphId).then(contextsModel => {
@@ -73,10 +74,10 @@ export default class GroupManagerService {
                 return el.type.includes("GroupContext");
             })
 
-            if (typeof contextType === "undefined") return allGroupContexts;
+            if (typeof childType === "undefined") return allGroupContexts;
 
             return allGroupContexts.filter(el => {
-                return el.type.includes(contextType);
+                return el.type.includes(childType);
             })
 
         })
