@@ -26,4 +26,33 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CATEGORY_TYPE = "groupingCategory";
 exports.CONTEXT_TO_CATEGORY_RELATION = "hasCategory";
 exports.CATEGORY_TO_GROUP_RELATION = "hasGroup";
+///////////////////////////////////////////
+//            OLD DATA                   //
+///////////////////////////////////////////
+exports.OLD_CONTEXTS_TYPES = Object.freeze({
+    ROOMS_GROUP_CONTEXT: "RoomsGroupContext",
+    EQUIPMENTS_GROUP_CONTEXT: "EquipmentGroupContext",
+    ENDPOINTS_GROUP_CONTEXT: "EndpointGroupContext"
+});
+exports.OLD_GROUPS_TYPES = Object.freeze({
+    ROOMS_GROUP: "roomsGroup",
+    EQUIPMENTS_GROUP: "equipmentGroup",
+    ENDPOINT_GROUP: "endpointGroup"
+});
+exports.OLD_RELATIONS_TYPES = Object.freeze({
+    GROUP_TO_ROOMS_RELATION: "groupHasRooms",
+    GROUP_TO_EQUIPMENTS_RELATION: "groupHasEquipments",
+    GROUP_TO_ENDPOINT_RELATION: "groupHasEndpoints"
+});
+///////////////////////////////////////////
+//            EXPORT ALL                 //
+///////////////////////////////////////////
+exports.default = {
+    CATEGORY_TYPE: exports.CATEGORY_TYPE,
+    CONTEXT_TO_CATEGORY_RELATION: exports.CONTEXT_TO_CATEGORY_RELATION,
+    CATEGORY_TO_GROUP_RELATION: exports.CATEGORY_TO_GROUP_RELATION,
+    OLD_CONTEXTS_TYPES: exports.OLD_CONTEXTS_TYPES,
+    OLD_GROUPS_TYPES: exports.OLD_GROUPS_TYPES,
+    OLD_RELATIONS_TYPES: exports.OLD_RELATIONS_TYPES
+};
 //# sourceMappingURL=constants.js.map

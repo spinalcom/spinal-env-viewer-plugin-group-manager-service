@@ -25,7 +25,7 @@
 
 import { SpinalGraphService, SPINAL_RELATION_PTR_LST_TYPE } from "spinal-env-viewer-graph-service";
 
-import { CATEGORY_TYPE, CONTEXT_TO_CATEGORY_RELATION, CATEGORY_TO_GROUP_RELATION } from "./constants";
+import { CATEGORY_TYPE, CONTEXT_TO_CATEGORY_RELATION, CATEGORY_TO_GROUP_RELATION, OLD_CONTEXTS_TYPES } from "./constants";
 
 import { Model } from 'spinal-core-connectorjs_type';
 
@@ -91,7 +91,7 @@ export default class SpinalCategory {
 
     }
 
-    public elementIsInCategorie(categoryId: string, elementId: string): Promise<Boolean> {
+    public elementIsInCategorie(categoryId: string, elementId: string): Promise<any> {
         return SpinalGraphService.getChildren(categoryId, [CATEGORY_TO_GROUP_RELATION]).then(children => {
             let itemFound = children.find((child: any) => {
                 return child.childrenIds.find(el => {
@@ -99,10 +99,31 @@ export default class SpinalCategory {
                 })
             })
 
-            return itemFound ? true : false;
+            return itemFound;
         })
     }
 
+    public async updateCategory(categoryId: string, dataObject: {
+        name?: string,
+        icon?: string
+    }): Promise<any> {
+        let realNode = SpinalGraphService.getRealNode(categoryId);
+
+        for (const key in dataObject) {
+            if (dataObject.hasOwnProperty(key)) {
+                const value = dataObject[key];
+                if (realNode.info[key]) {
+                    realNode.info[key].set(value);
+                } else {
+                    realNode.info.add_attr({
+                        [key]: value
+                    });
+                }
+            }
+        }
+
+        return realNode;
+    }
 
     ////////////////////////////////////////////////////////////////////
     //                      PRIVATES                                  //
@@ -112,7 +133,10 @@ export default class SpinalCategory {
         return type === this.CATEGORY_TYPE;
     }
 
-    private _isContext(type: string): any {
+    public _isContext(type: string): any {
+        const values = Object.values(OLD_CONTEXTS_TYPES);
+        if (values.indexOf(type) !== -1) return true;
+
         return type.includes("GroupContext");
     }
 

@@ -23,13 +23,15 @@
  */
 
 
-import { SpinalGraphService, SpinalContext } from "spinal-env-viewer-graph-service";
+import { SpinalGraphService } from "spinal-env-viewer-graph-service";
 
 import { Model } from 'spinal-core-connectorjs_type';
 
+import geographicService from 'spinal-env-viewer-context-geographic-service'
 
 import SpinalGroup from "./SpinalGroup";
 import SpinalCategory from "./SpinalCategory";
+import constants, { OLD_GROUPS_TYPES, OLD_CONTEXTS_TYPES } from "./constants";
 
 export default class GroupManagerService {
 
@@ -43,6 +45,7 @@ export default class GroupManagerService {
 
     private spinalGroup: SpinalGroup;
     private spinalCategory: SpinalCategory;
+    public constants: any = constants;
 
     constructor() {
         this.spinalGroup = new SpinalGroup();
@@ -99,15 +102,27 @@ export default class GroupManagerService {
         return this.spinalGroup.getGroups(nodeId);
     }
 
-    public linkElementToGroup(contextId: string, groupId: string, elementId: string): Promise<any> {
-        return this.spinalGroup.linkElementToGroup(contextId, groupId, elementId);
+    public async linkElementToGroup(contextId: string, groupId: string, elementId: string): Promise<any> {
+
+        const category = await this.getGroupCategory(groupId);
+        const group = await this.elementIsInCategorie(category.id.get(), elementId);
+        const result = { old_group: undefined, newGroup: groupId };
+
+        if (typeof group !== "undefined") {
+            this.unLinkElementToGroup(group.id.get(), elementId);
+            result.old_group = group.id.get();
+        }
+
+        await this.spinalGroup.linkElementToGroup(contextId, groupId, elementId);
+
+        return result;
     }
 
     public elementIsLinkedToGroup(groupId: string, elementId: string): Boolean {
         return this.spinalGroup.elementIsLinkedToGroup(groupId, elementId);
     }
 
-    public elementIsInCategorie(categoryId: string, elementId: string): Promise<Boolean> {
+    public elementIsInCategorie(categoryId: string, elementId: string): Promise<any> {
         return this.spinalCategory.elementIsInCategorie(categoryId, elementId);
     }
 
@@ -119,6 +134,14 @@ export default class GroupManagerService {
         return this.spinalGroup.getElementsLinkedToGroup(groupId);
     }
 
+    public getGroupCategory(groupId: string): Promise<any> {
+        return this.spinalGroup.getCategory(groupId);
+    }
+
+    public isContext(type: string): boolean {
+        return this.spinalCategory._isContext(type);
+    }
+
     public isCategory(type: string): boolean {
         return this.spinalCategory._isCategory(type);
     }
@@ -127,8 +150,30 @@ export default class GroupManagerService {
         return this.spinalGroup._isGroup(type);
     }
 
-    public getGroupCategory(groupId: string): Promise<any> {
-        return this.spinalGroup.getCategory(groupId);
+    public isRoomsGroup(type): boolean {
+        return type == `${geographicService.constants.ROOM_TYPE}Group` || OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT.replace("Context", "") == type || type === OLD_GROUPS_TYPES.ROOMS_GROUP;
+    }
+
+    public isEquipementGroup(type): boolean {
+        return type == `${geographicService.constants.EQUIPMENT_TYPE}Group` || OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT.replace("Context", "") == type || type === OLD_GROUPS_TYPES.EQUIPMENTS_GROUP;
+    }
+
+    public isEndpointGroup(type): boolean {
+        return;
+    }
+
+    public updateCategory(categoryId: string, dataObject: {
+        name?: string,
+        icon?: string
+    }): Promise<any> {
+        return this.spinalCategory.updateCategory(categoryId, dataObject);
+    }
+
+    public updateGroup(categoryId: string, dataObject: {
+        name?: string,
+        color?: string
+    }): Promise<any> {
+        return this.spinalGroup.updateGroup(categoryId, dataObject);
     }
 
 }

@@ -22,13 +22,25 @@
  * with this file. If not, see
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
 const spinal_core_connectorjs_type_1 = require("spinal-core-connectorjs_type");
+const spinal_env_viewer_context_geographic_service_1 = require("spinal-env-viewer-context-geographic-service");
 const SpinalGroup_1 = require("./SpinalGroup");
 const SpinalCategory_1 = require("./SpinalCategory");
+const constants_1 = require("./constants");
 class GroupManagerService {
     constructor() {
+        this.constants = constants_1.default;
         this.spinalGroup = new SpinalGroup_1.default();
         this.spinalCategory = new SpinalCategory_1.default();
     }
@@ -68,7 +80,17 @@ class GroupManagerService {
         return this.spinalGroup.getGroups(nodeId);
     }
     linkElementToGroup(contextId, groupId, elementId) {
-        return this.spinalGroup.linkElementToGroup(contextId, groupId, elementId);
+        return __awaiter(this, void 0, void 0, function* () {
+            const category = yield this.getGroupCategory(groupId);
+            const group = yield this.elementIsInCategorie(category.id.get(), elementId);
+            const result = { old_group: undefined, newGroup: groupId };
+            if (typeof group !== "undefined") {
+                this.unLinkElementToGroup(group.id.get(), elementId);
+                result.old_group = group.id.get();
+            }
+            yield this.spinalGroup.linkElementToGroup(contextId, groupId, elementId);
+            return result;
+        });
     }
     elementIsLinkedToGroup(groupId, elementId) {
         return this.spinalGroup.elementIsLinkedToGroup(groupId, elementId);
@@ -82,14 +104,32 @@ class GroupManagerService {
     getElementsLinkedToGroup(groupId) {
         return this.spinalGroup.getElementsLinkedToGroup(groupId);
     }
+    getGroupCategory(groupId) {
+        return this.spinalGroup.getCategory(groupId);
+    }
+    isContext(type) {
+        return this.spinalCategory._isContext(type);
+    }
     isCategory(type) {
         return this.spinalCategory._isCategory(type);
     }
     isGroup(type) {
         return this.spinalGroup._isGroup(type);
     }
-    getGroupCategory(groupId) {
-        return this.spinalGroup.getCategory(groupId);
+    isRoomsGroup(type) {
+        return type == `${spinal_env_viewer_context_geographic_service_1.default.constants.ROOM_TYPE}Group` || constants_1.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT.replace("Context", "") == type || type === constants_1.OLD_GROUPS_TYPES.ROOMS_GROUP;
+    }
+    isEquipementGroup(type) {
+        return type == `${spinal_env_viewer_context_geographic_service_1.default.constants.EQUIPMENT_TYPE}Group` || constants_1.OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT.replace("Context", "") == type || type === constants_1.OLD_GROUPS_TYPES.EQUIPMENTS_GROUP;
+    }
+    isEndpointGroup(type) {
+        return;
+    }
+    updateCategory(categoryId, dataObject) {
+        return this.spinalCategory.updateCategory(categoryId, dataObject);
+    }
+    updateGroup(categoryId, dataObject) {
+        return this.spinalGroup.updateGroup(categoryId, dataObject);
     }
 }
 exports.default = GroupManagerService;

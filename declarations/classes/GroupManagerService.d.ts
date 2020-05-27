@@ -1,6 +1,7 @@
 export default class GroupManagerService {
     private spinalGroup;
     private spinalCategory;
+    constants: any;
     constructor();
     createGroupContext(contextName: string, childrenType: string): Promise<any>;
     getGroupĈontexts(childType?: string): Promise<any>;
@@ -10,10 +11,22 @@ export default class GroupManagerService {
     getGroups(nodeId: string): Promise<any>;
     linkElementToGroup(contextId: string, groupId: string, elementId: string): Promise<any>;
     elementIsLinkedToGroup(groupId: string, elementId: string): Boolean;
-    elementIsInCategorie(categoryId: string, elementId: string): Promise<Boolean>;
+    elementIsInCategorie(categoryId: string, elementId: string): Promise<any>;
     unLinkElementToGroup(groupId: string, elementId: string): Promise<any>;
     getElementsLinkedToGroup(groupId: string): Promise<any>;
+    getGroupCategory(groupId: string): Promise<any>;
+    isContext(type: string): boolean;
     isCategory(type: string): boolean;
     isGroup(type: string): boolean;
-    getGroupCategory(groupId: string): Promise<any>;
+    isRoomsGroup(type: any): boolean;
+    isEquipementGroup(type: any): boolean;
+    isEndpointGroup(type: any): boolean;
+    updateCategory(categoryId: string, dataObject: {
+        name?: string;
+        icon?: string;
+    }): Promise<any>;
+    updateGroup(categoryId: string, dataObject: {
+        name?: string;
+        color?: string;
+    }): Promise<any>;
 }

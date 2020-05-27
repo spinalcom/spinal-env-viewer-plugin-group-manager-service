@@ -1,5 +1,6 @@
 export default class SpinalGroup {
     CATEGORY_TO_GROUP_RELATION: string;
+    RELATION_BEGIN: string;
     constructor();
     addGroup(contextId: string, categoryId: string, groupName: string, groupColor: string): Promise<any>;
     linkElementToGroup(contextId: string, groupId: string, elementId: string): Promise<any>;
@@ -8,7 +9,11 @@ export default class SpinalGroup {
     getElementsLinkedToGroup(groupId: string): Promise<any>;
     getGroups(nodeId: string): Promise<any>;
     getCategory(groupId: string): Promise<any>;
-    private _getChildrenType;
+    updateGroup(groupId: string, dataObject: {
+        name?: string;
+        color?: string;
+    }): Promise<any>;
     _isGroup(type: string): boolean;
+    private _getChildrenType;
     private _groupNameExist;
 }

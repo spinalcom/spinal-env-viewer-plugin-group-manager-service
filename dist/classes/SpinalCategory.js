@@ -85,7 +85,26 @@ class SpinalCategory {
                     return el === elementId;
                 });
             });
-            return itemFound ? true : false;
+            return itemFound;
+        });
+    }
+    updateCategory(categoryId, dataObject) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let realNode = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(categoryId);
+            for (const key in dataObject) {
+                if (dataObject.hasOwnProperty(key)) {
+                    const value = dataObject[key];
+                    if (realNode.info[key]) {
+                        realNode.info[key].set(value);
+                    }
+                    else {
+                        realNode.info.add_attr({
+                            [key]: value
+                        });
+                    }
+                }
+            }
+            return realNode;
         });
     }
     ////////////////////////////////////////////////////////////////////
@@ -95,6 +114,9 @@ class SpinalCategory {
         return type === this.CATEGORY_TYPE;
     }
     _isContext(type) {
+        const values = Object.values(constants_1.OLD_CONTEXTS_TYPES);
+        if (values.indexOf(type) !== -1)
+            return true;
         return type.includes("GroupContext");
     }
     _getRelationRefs(nodeId) {

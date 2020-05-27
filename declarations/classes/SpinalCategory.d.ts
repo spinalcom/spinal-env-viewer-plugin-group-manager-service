@@ -4,9 +4,13 @@ export default class SpinalCategory {
     constructor();
     addCategory(contextId: string, categoryName: string, iconName: string): Promise<any>;
     getCategories(nodeId: string): Promise<any>;
-    elementIsInCategorie(categoryId: string, elementId: string): Promise<Boolean>;
+    elementIsInCategorie(categoryId: string, elementId: string): Promise<any>;
+    updateCategory(categoryId: string, dataObject: {
+        name?: string;
+        icon?: string;
+    }): Promise<any>;
     _isCategory(type: string): any;
-    private _isContext;
+    _isContext(type: string): any;
     private _getRelationRefs;
     private _categoryNameExist;
 }

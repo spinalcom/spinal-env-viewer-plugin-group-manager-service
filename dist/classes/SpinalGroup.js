@@ -38,6 +38,7 @@ const spinal_core_connectorjs_type_1 = require("spinal-core-connectorjs_type");
 class SpinalGroup {
     constructor() {
         this.CATEGORY_TO_GROUP_RELATION = constants_1.CATEGORY_TO_GROUP_RELATION;
+        this.RELATION_BEGIN = "groupHas";
     }
     addGroup(contextId, categoryId, groupName, groupColor) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -61,14 +62,16 @@ class SpinalGroup {
         });
     }
     linkElementToGroup(contextId, groupId, elementId) {
-        let groupInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(groupId);
-        let elementInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(elementId);
-        if (groupInfo && elementInfo) {
-            let childrenType = this._getChildrenType(groupInfo.type.get());
-            if (childrenType === elementInfo.type.get())
-                return spinal_env_viewer_graph_service_1.SpinalGraphService.addChildInContext(groupId, elementId, contextId, `groupHas${elementInfo.type.get()}`, spinal_env_viewer_graph_service_1.SPINAL_RELATION_LST_PTR_TYPE);
-        }
-        throw Error(`${elementInfo.type.get()} cannot be linked to this group.`);
+        return __awaiter(this, void 0, void 0, function* () {
+            let groupInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(groupId);
+            let elementInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(elementId);
+            if (groupInfo && elementInfo) {
+                let childrenType = this._getChildrenType(groupInfo.type.get());
+                if (childrenType === elementInfo.type.get())
+                    return spinal_env_viewer_graph_service_1.SpinalGraphService.addChildInContext(groupId, elementId, contextId, `${this.RELATION_BEGIN}${elementInfo.type.get()}`, spinal_env_viewer_graph_service_1.SPINAL_RELATION_LST_PTR_TYPE);
+            }
+            throw Error(`${elementInfo.type.get()} cannot be linked to this group.`);
+        });
     }
     elementIsLinkedToGroup(groupId, elementId) {
         let childrenIds = spinal_env_viewer_graph_service_1.SpinalGraphService.getChildrenIds(groupId);
@@ -76,13 +79,13 @@ class SpinalGroup {
     }
     unLinkElementToGroup(groupId, elementId) {
         let elementInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(elementId);
-        let relationName = `groupHas${elementInfo.type.get()}`;
+        let relationName = `${this.RELATION_BEGIN}${elementInfo.type.get()}`;
         return spinal_env_viewer_graph_service_1.SpinalGraphService.removeChild(groupId, elementId, relationName, spinal_env_viewer_graph_service_1.SPINAL_RELATION_LST_PTR_TYPE);
     }
     getElementsLinkedToGroup(groupId) {
         let groupInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(groupId);
         let type = this._getChildrenType(groupInfo.type.get());
-        let relationName = `groupHas${type}`;
+        let relationName = `${this.RELATION_BEGIN}${type}`;
         return spinal_env_viewer_graph_service_1.SpinalGraphService.getChildren(groupId, [relationName]);
     }
     getGroups(nodeId) {
@@ -93,7 +96,7 @@ class SpinalGroup {
         let relations = [
             constants_1.CONTEXT_TO_CATEGORY_RELATION,
             constants_1.CATEGORY_TO_GROUP_RELATION,
-            `groupHas${nodeInfo.type.get()}`
+            `${this.RELATION_BEGIN}${nodeInfo.type.get()}`
         ];
         return spinal_env_viewer_graph_service_1.SpinalGraphService.findNodes(nodeId, relations, (node) => {
             let argType = node.getType().get();
@@ -112,15 +115,34 @@ class SpinalGroup {
                 return parents[0];
         });
     }
+    updateGroup(groupId, dataObject) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let realNode = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(groupId);
+            for (const key in dataObject) {
+                if (dataObject.hasOwnProperty(key)) {
+                    const value = dataObject[key];
+                    if (realNode.info[key]) {
+                        realNode.info[key].set(value);
+                    }
+                    else {
+                        realNode.info.add_attr({
+                            [key]: value
+                        });
+                    }
+                }
+            }
+            return realNode;
+        });
+    }
+    _isGroup(type) {
+        let stringEnd = type.substr(type.length - 5);
+        return stringEnd === "Group";
+    }
     ////////////////////////////////////////////////////////////////////
     //                      PRIVATES                                  //
     ////////////////////////////////////////////////////////////////////
     _getChildrenType(elementType) {
         return elementType.includes("GroupContext") ? elementType.replace("GroupContext", "") : elementType.replace("Group", "");
-    }
-    _isGroup(type) {
-        let stringEnd = type.substr(type.length - 5);
-        return stringEnd === "Group";
     }
     _groupNameExist(nodeId, groupName) {
         return __awaiter(this, void 0, void 0, function* () {
