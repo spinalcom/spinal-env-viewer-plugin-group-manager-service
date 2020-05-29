@@ -28,9 +28,11 @@ import { SpinalGraphService } from "spinal-env-viewer-graph-service";
 import { Model } from 'spinal-core-connectorjs_type';
 
 import geographicService from 'spinal-env-viewer-context-geographic-service'
+import { SpinalBmsEndpoint } from "spinal-model-bmsnetwork";
 
 import SpinalGroup from "./SpinalGroup";
 import SpinalCategory from "./SpinalCategory";
+
 import constants, { OLD_GROUPS_TYPES, OLD_CONTEXTS_TYPES } from "./constants";
 
 export default class GroupManagerService {
@@ -65,7 +67,7 @@ export default class GroupManagerService {
 
     }
 
-    public getGroupĈontexts(childType?: string): Promise<any> {
+    public getGroupContexts(childType?: string): Promise<any> {
 
         let graphId = SpinalGraphService.getGraph().getId().get();
 
@@ -79,8 +81,10 @@ export default class GroupManagerService {
 
             if (typeof childType === "undefined") return allGroupContexts;
 
+            const oldType = this._getOldTypes(childType);
+
             return allGroupContexts.filter(el => {
-                return el.type.includes(childType);
+                return el.type.includes(childType) || el.type === oldType;
             })
 
         })
@@ -175,5 +179,24 @@ export default class GroupManagerService {
     }): Promise<any> {
         return this.spinalGroup.updateGroup(categoryId, dataObject);
     }
+
+
+    ////////////////////////////////////////////////////////////////////
+    //                      PRIVATES                                  //
+    ////////////////////////////////////////////////////////////////////
+
+    private _getOldTypes(type) {
+        switch (type) {
+            case geographicService.constants.ROOM_TYPE:
+                return this.constants.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT;
+
+            case geographicService.constants.EQUIPMENT_TYPE:
+                return this.constants.OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT;
+
+            case SpinalBmsEndpoint.nodeTypeName:
+                return this.constants.OLD_CONTEXTS_TYPES.ENDPOINTS_GROUP_CONTEXT;
+        }
+    }
+
 
 }

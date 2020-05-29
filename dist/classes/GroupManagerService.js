@@ -35,6 +35,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
 const spinal_core_connectorjs_type_1 = require("spinal-core-connectorjs_type");
 const spinal_env_viewer_context_geographic_service_1 = require("spinal-env-viewer-context-geographic-service");
+const spinal_model_bmsnetwork_1 = require("spinal-model-bmsnetwork");
 const SpinalGroup_1 = require("./SpinalGroup");
 const SpinalCategory_1 = require("./SpinalCategory");
 const constants_1 = require("./constants");
@@ -53,7 +54,7 @@ class GroupManagerService {
             childType: childrenType
         }));
     }
-    getGroupĈontexts(childType) {
+    getGroupContexts(childType) {
         let graphId = spinal_env_viewer_graph_service_1.SpinalGraphService.getGraph().getId().get();
         return spinal_env_viewer_graph_service_1.SpinalGraphService.getChildren(graphId).then(contextsModel => {
             let contexts = contextsModel.map(el => el.get());
@@ -62,8 +63,9 @@ class GroupManagerService {
             });
             if (typeof childType === "undefined")
                 return allGroupContexts;
+            const oldType = this._getOldTypes(childType);
             return allGroupContexts.filter(el => {
-                return el.type.includes(childType);
+                return el.type.includes(childType) || el.type === oldType;
             });
         });
     }
@@ -130,6 +132,19 @@ class GroupManagerService {
     }
     updateGroup(categoryId, dataObject) {
         return this.spinalGroup.updateGroup(categoryId, dataObject);
+    }
+    ////////////////////////////////////////////////////////////////////
+    //                      PRIVATES                                  //
+    ////////////////////////////////////////////////////////////////////
+    _getOldTypes(type) {
+        switch (type) {
+            case spinal_env_viewer_context_geographic_service_1.default.constants.ROOM_TYPE:
+                return this.constants.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT;
+            case spinal_env_viewer_context_geographic_service_1.default.constants.EQUIPMENT_TYPE:
+                return this.constants.OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT;
+            case spinal_model_bmsnetwork_1.SpinalBmsEndpoint.nodeTypeName:
+                return this.constants.OLD_CONTEXTS_TYPES.ENDPOINTS_GROUP_CONTEXT;
+        }
     }
 }
 exports.default = GroupManagerService;

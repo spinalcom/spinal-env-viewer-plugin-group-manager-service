@@ -4,7 +4,7 @@ export default class GroupManagerService {
     constants: any;
     constructor();
     createGroupContext(contextName: string, childrenType: string): Promise<any>;
-    getGroupĈontexts(childType?: string): Promise<any>;
+    getGroupContexts(childType?: string): Promise<any>;
     addCategory(contextId: string, categoryName: string, iconName: string): Promise<any>;
     getCategories(nodeId: string): Promise<any>;
     addGroup(contextId: string, categoryId: string, groupName: string, groupColor: string): Promise<any>;
@@ -29,4 +29,5 @@ export default class GroupManagerService {
         name?: string;
         color?: string;
     }): Promise<any>;
+    private _getOldTypes;
 }

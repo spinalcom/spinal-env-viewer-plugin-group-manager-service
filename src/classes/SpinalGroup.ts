@@ -25,10 +25,12 @@
 
 import { SpinalGraphService, SPINAL_RELATION_PTR_LST_TYPE, SPINAL_RELATION_LST_PTR_TYPE } from "spinal-env-viewer-graph-service"
 
-import { CATEGORY_TO_GROUP_RELATION, CONTEXT_TO_CATEGORY_RELATION, OLD_GROUPS_TYPES } from "./constants";
+import { CATEGORY_TO_GROUP_RELATION, CONTEXT_TO_CATEGORY_RELATION, OLD_RELATIONS_TYPES } from "./constants";
 
 import { Model } from 'spinal-core-connectorjs_type';
 
+import geographicService from 'spinal-env-viewer-context-geographic-service';
+import { SpinalBmsEndpoint } from "spinal-model-bmsnetwork";
 
 export default class SpinalGroup {
 
@@ -92,9 +94,15 @@ export default class SpinalGroup {
 
     public unLinkElementToGroup(groupId: string, elementId: string): Promise<any> {
         let elementInfo = SpinalGraphService.getInfo(elementId);
+
         let relationName = `${this.RELATION_BEGIN}${elementInfo.type.get()}`;
 
-        return SpinalGraphService.removeChild(groupId, elementId, relationName, SPINAL_RELATION_LST_PTR_TYPE);
+        return SpinalGraphService.removeChild(groupId, elementId, relationName, SPINAL_RELATION_LST_PTR_TYPE).then((result) => {
+            if (!result) {
+                relationName = this._getGroupRelation(elementInfo.type.get());
+                return SpinalGraphService.removeChild(groupId, elementId, relationName, SPINAL_RELATION_PTR_LST_TYPE);
+            }
+        })
     }
 
 
@@ -102,9 +110,13 @@ export default class SpinalGroup {
         let groupInfo = SpinalGraphService.getInfo(groupId);
 
         let type = this._getChildrenType(groupInfo.type.get());
-        let relationName = `${this.RELATION_BEGIN}${type}`;
+        let relationNames = [`${this.RELATION_BEGIN}${type}`];
 
-        return SpinalGraphService.getChildren(groupId, [relationName]);
+        const tempRel = this._getGroupRelation(type)
+
+        if (typeof tempRel !== "undefined") relationNames.push(tempRel);
+
+        return SpinalGraphService.getChildren(groupId, relationNames);
     }
 
 
@@ -118,7 +130,10 @@ export default class SpinalGroup {
         let relations = [
             CONTEXT_TO_CATEGORY_RELATION,
             CATEGORY_TO_GROUP_RELATION,
-            `${this.RELATION_BEGIN}${nodeInfo.type.get()}`
+            `${this.RELATION_BEGIN}${nodeInfo.type.get()}`,
+            OLD_RELATIONS_TYPES.GROUP_TO_ENDPOINT_RELATION,
+            OLD_RELATIONS_TYPES.GROUP_TO_EQUIPMENTS_RELATION,
+            OLD_RELATIONS_TYPES.GROUP_TO_ROOMS_RELATION
         ]
 
         return SpinalGraphService.findNodes(nodeId, relations, (node) => {
@@ -186,6 +201,28 @@ export default class SpinalGroup {
         }
 
         return;
+    }
+
+    private _getGroupRelation(type: string | String): string {
+        let relationName;
+
+        switch (type) {
+            case geographicService.constants.ROOM_TYPE:
+                relationName = OLD_RELATIONS_TYPES.GROUP_TO_ROOMS_RELATION
+                break;
+
+            case geographicService.constants.EQUIPMENT_TYPE:
+                relationName = OLD_RELATIONS_TYPES.GROUP_TO_EQUIPMENTS_RELATION
+
+
+                break;
+            case SpinalBmsEndpoint.nodeTypeName:
+                relationName = OLD_RELATIONS_TYPES.GROUP_TO_ENDPOINT_RELATION
+                break;
+        }
+
+        return relationName;
+
     }
 
 }

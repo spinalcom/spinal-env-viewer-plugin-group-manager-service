@@ -16,4 +16,5 @@ export default class SpinalGroup {
     _isGroup(type: string): boolean;
     private _getChildrenType;
     private _groupNameExist;
+    private _getGroupRelation;
 }
