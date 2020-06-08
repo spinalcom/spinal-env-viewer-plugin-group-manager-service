@@ -149,7 +149,7 @@ export default class SpinalGroup {
     }
 
     public async getCategory(groupId: string): Promise<any> {
-        const parents = await SpinalGraphService.getParents(groupId, [this.CATEGORY_TO_GROUP_RELATION]);
+        const parents = await SpinalGraphService.getParents(groupId, this.CATEGORY_TO_GROUP_RELATION);
         if (parents.length > 0) return parents[0];
     }
 

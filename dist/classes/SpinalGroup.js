@@ -123,7 +123,7 @@ class SpinalGroup {
     }
     getCategory(groupId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const parents = yield spinal_env_viewer_graph_service_1.SpinalGraphService.getParents(groupId, [this.CATEGORY_TO_GROUP_RELATION]);
+            const parents = yield spinal_env_viewer_graph_service_1.SpinalGraphService.getParents(groupId, this.CATEGORY_TO_GROUP_RELATION);
             if (parents.length > 0)
                 return parents[0];
         });
