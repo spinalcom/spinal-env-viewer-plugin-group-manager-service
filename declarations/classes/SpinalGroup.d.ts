@@ -15,6 +15,7 @@ export default class SpinalGroup {
     }): Promise<any>;
     _isGroup(type: string): boolean;
     private _getChildrenType;
+    private _isOldGroup;
     private _groupNameExist;
     private _getGroupRelation;
 }

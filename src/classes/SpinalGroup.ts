@@ -25,7 +25,7 @@
 
 import { SpinalGraphService, SPINAL_RELATION_PTR_LST_TYPE, SPINAL_RELATION_LST_PTR_TYPE } from "spinal-env-viewer-graph-service"
 
-import { CATEGORY_TO_GROUP_RELATION, CONTEXT_TO_CATEGORY_RELATION, OLD_RELATIONS_TYPES } from "./constants";
+import { CATEGORY_TO_GROUP_RELATION, CONTEXT_TO_CATEGORY_RELATION, OLD_RELATIONS_TYPES, OLD_GROUPS_TYPES, OLD_CONTEXTS_TYPES } from "./constants";
 
 import { Model } from 'spinal-core-connectorjs_type';
 
@@ -72,19 +72,18 @@ export default class SpinalGroup {
     }
 
     public async linkElementToGroup(contextId: string, groupId: string, elementId: string): Promise<any> {
-        let groupInfo = SpinalGraphService.getInfo(groupId);
+        let contextInfo = SpinalGraphService.getInfo(contextId);
         let elementInfo = SpinalGraphService.getInfo(elementId);
 
-        if (groupInfo && elementInfo) {
-            let childrenType = this._getChildrenType(groupInfo.type.get());
-            if (childrenType === elementInfo.type.get())
+        if (contextInfo && elementInfo) {
+            let childrenType = this._getChildrenType(contextInfo.type.get());
+
+            if (childrenType === elementInfo.type.get() || this._isOldGroup(contextInfo.type.get(), elementInfo.type.get()))
                 return SpinalGraphService.addChildInContext(groupId, elementId, contextId, `${this.RELATION_BEGIN}${elementInfo.type.get()}`, SPINAL_RELATION_LST_PTR_TYPE)
 
         }
 
         throw Error(`${elementInfo.type.get()} cannot be linked to this group.`);
-
-
     }
 
     public elementIsLinkedToGroup(groupId: string, elementId: string): Boolean {
@@ -99,7 +98,8 @@ export default class SpinalGroup {
 
         return SpinalGraphService.removeChild(groupId, elementId, relationName, SPINAL_RELATION_LST_PTR_TYPE).then((result) => {
             if (!result) {
-                relationName = this._getGroupRelation(elementInfo.type.get());
+                const groupInfo = SpinalGraphService.getInfo(groupId)
+                relationName = this._getGroupRelation(groupInfo.type.get());
                 return SpinalGraphService.removeChild(groupId, elementId, relationName, SPINAL_RELATION_PTR_LST_TYPE);
             }
         })
@@ -110,9 +110,10 @@ export default class SpinalGroup {
         let groupInfo = SpinalGraphService.getInfo(groupId);
 
         let type = this._getChildrenType(groupInfo.type.get());
+
         let relationNames = [`${this.RELATION_BEGIN}${type}`];
 
-        const tempRel = this._getGroupRelation(type)
+        const tempRel = this._getGroupRelation(groupInfo.type.get());
 
         if (typeof tempRel !== "undefined") relationNames.push(tempRel);
 
@@ -177,9 +178,11 @@ export default class SpinalGroup {
 
     public _isGroup(type: string) {
 
-        let stringEnd = type.substr(type.length - 5);
+        // let stringEnd = type.substr(type.length - 5);
 
-        return stringEnd === "Group";
+        // return stringEnd === "Group";
+
+        return /Group$/.test(type);
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -188,9 +191,44 @@ export default class SpinalGroup {
 
 
     private _getChildrenType(elementType: string): String {
-        return elementType.includes("GroupContext") ? elementType.replace("GroupContext", "") : elementType.replace("Group", "");
+
+
+
+        if (elementType.toLowerCase() === OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT.toLowerCase() || elementType.toLowerCase() === OLD_GROUPS_TYPES.ROOMS_GROUP.toLowerCase()) {
+
+            return geographicService.constants.ROOM_TYPE;
+
+        } else if (elementType.toLowerCase() === OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT.toLowerCase() || elementType.toLowerCase() === OLD_GROUPS_TYPES.EQUIPMENTS_GROUP.toLowerCase()) {
+
+            return geographicService.constants.EQUIPMENT_TYPE
+
+        } else if (elementType.toLowerCase() === OLD_CONTEXTS_TYPES.ENDPOINTS_GROUP_CONTEXT.toLowerCase() || elementType.toLowerCase() === OLD_GROUPS_TYPES.ENDPOINT_GROUP.toLowerCase()) {
+
+            return SpinalBmsEndpoint.nodeTypeName;
+
+        } else {
+
+            if (/GroupContext$/.test(elementType)) return elementType.replace("GroupContext", "");
+
+            else if (/Group$/.test(elementType)) return elementType.replace("Group", "");
+
+            throw new Error(`${elementType} is not a group element type`);
+
+        }
+
     }
 
+    private _isOldGroup(contextType: string, elementType: string) {
+
+        const isRoomGroup = contextType === OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT && elementType === geographicService.constants.ROOM_TYPE;
+        const isEquipementGroup = contextType === OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT && elementType === geographicService.constants.EQUIPMENT_TYPE;
+        const isEndpointGroup = contextType === OLD_CONTEXTS_TYPES.ENDPOINTS_GROUP_CONTEXT && elementType === SpinalBmsEndpoint.nodeTypeName;
+
+        console.log(isRoomGroup, isEquipementGroup, isEndpointGroup);
+
+        return isRoomGroup || isEquipementGroup || isEndpointGroup;
+
+    }
 
     private async _groupNameExist(nodeId: string, groupName: string) {
         const groups = await this.getGroups(nodeId);
@@ -206,17 +244,17 @@ export default class SpinalGroup {
     private _getGroupRelation(type: string | String): string {
         let relationName;
 
-        switch (type) {
-            case geographicService.constants.ROOM_TYPE:
+        switch (type.toLowerCase()) {
+            case OLD_GROUPS_TYPES.ROOMS_GROUP.toLowerCase():
                 relationName = OLD_RELATIONS_TYPES.GROUP_TO_ROOMS_RELATION
                 break;
 
-            case geographicService.constants.EQUIPMENT_TYPE:
+            case OLD_GROUPS_TYPES.EQUIPMENTS_GROUP.toLowerCase():
                 relationName = OLD_RELATIONS_TYPES.GROUP_TO_EQUIPMENTS_RELATION
 
 
                 break;
-            case SpinalBmsEndpoint.nodeTypeName:
+            case OLD_GROUPS_TYPES.EQUIPMENTS_GROUP.toLowerCase():
                 relationName = OLD_RELATIONS_TYPES.GROUP_TO_ENDPOINT_RELATION
                 break;
         }

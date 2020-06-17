@@ -65,11 +65,11 @@ class SpinalGroup {
     }
     linkElementToGroup(contextId, groupId, elementId) {
         return __awaiter(this, void 0, void 0, function* () {
-            let groupInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(groupId);
+            let contextInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(contextId);
             let elementInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(elementId);
-            if (groupInfo && elementInfo) {
-                let childrenType = this._getChildrenType(groupInfo.type.get());
-                if (childrenType === elementInfo.type.get())
+            if (contextInfo && elementInfo) {
+                let childrenType = this._getChildrenType(contextInfo.type.get());
+                if (childrenType === elementInfo.type.get() || this._isOldGroup(contextInfo.type.get(), elementInfo.type.get()))
                     return spinal_env_viewer_graph_service_1.SpinalGraphService.addChildInContext(groupId, elementId, contextId, `${this.RELATION_BEGIN}${elementInfo.type.get()}`, spinal_env_viewer_graph_service_1.SPINAL_RELATION_LST_PTR_TYPE);
             }
             throw Error(`${elementInfo.type.get()} cannot be linked to this group.`);
@@ -84,7 +84,8 @@ class SpinalGroup {
         let relationName = `${this.RELATION_BEGIN}${elementInfo.type.get()}`;
         return spinal_env_viewer_graph_service_1.SpinalGraphService.removeChild(groupId, elementId, relationName, spinal_env_viewer_graph_service_1.SPINAL_RELATION_LST_PTR_TYPE).then((result) => {
             if (!result) {
-                relationName = this._getGroupRelation(elementInfo.type.get());
+                const groupInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(groupId);
+                relationName = this._getGroupRelation(groupInfo.type.get());
                 return spinal_env_viewer_graph_service_1.SpinalGraphService.removeChild(groupId, elementId, relationName, spinal_env_viewer_graph_service_1.SPINAL_RELATION_PTR_LST_TYPE);
             }
         });
@@ -93,7 +94,7 @@ class SpinalGroup {
         let groupInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(groupId);
         let type = this._getChildrenType(groupInfo.type.get());
         let relationNames = [`${this.RELATION_BEGIN}${type}`];
-        const tempRel = this._getGroupRelation(type);
+        const tempRel = this._getGroupRelation(groupInfo.type.get());
         if (typeof tempRel !== "undefined")
             relationNames.push(tempRel);
         return spinal_env_viewer_graph_service_1.SpinalGraphService.getChildren(groupId, relationNames);
@@ -148,14 +149,37 @@ class SpinalGroup {
         });
     }
     _isGroup(type) {
-        let stringEnd = type.substr(type.length - 5);
-        return stringEnd === "Group";
+        // let stringEnd = type.substr(type.length - 5);
+        // return stringEnd === "Group";
+        return /Group$/.test(type);
     }
     ////////////////////////////////////////////////////////////////////
     //                      PRIVATES                                  //
     ////////////////////////////////////////////////////////////////////
     _getChildrenType(elementType) {
-        return elementType.includes("GroupContext") ? elementType.replace("GroupContext", "") : elementType.replace("Group", "");
+        if (elementType.toLowerCase() === constants_1.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT.toLowerCase() || elementType.toLowerCase() === constants_1.OLD_GROUPS_TYPES.ROOMS_GROUP.toLowerCase()) {
+            return spinal_env_viewer_context_geographic_service_1.default.constants.ROOM_TYPE;
+        }
+        else if (elementType.toLowerCase() === constants_1.OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT.toLowerCase() || elementType.toLowerCase() === constants_1.OLD_GROUPS_TYPES.EQUIPMENTS_GROUP.toLowerCase()) {
+            return spinal_env_viewer_context_geographic_service_1.default.constants.EQUIPMENT_TYPE;
+        }
+        else if (elementType.toLowerCase() === constants_1.OLD_CONTEXTS_TYPES.ENDPOINTS_GROUP_CONTEXT.toLowerCase() || elementType.toLowerCase() === constants_1.OLD_GROUPS_TYPES.ENDPOINT_GROUP.toLowerCase()) {
+            return spinal_model_bmsnetwork_1.SpinalBmsEndpoint.nodeTypeName;
+        }
+        else {
+            if (/GroupContext$/.test(elementType))
+                return elementType.replace("GroupContext", "");
+            else if (/Group$/.test(elementType))
+                return elementType.replace("Group", "");
+            throw new Error(`${elementType} is not a group element type`);
+        }
+    }
+    _isOldGroup(contextType, elementType) {
+        const isRoomGroup = contextType === constants_1.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT && elementType === spinal_env_viewer_context_geographic_service_1.default.constants.ROOM_TYPE;
+        const isEquipementGroup = contextType === constants_1.OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT && elementType === spinal_env_viewer_context_geographic_service_1.default.constants.EQUIPMENT_TYPE;
+        const isEndpointGroup = contextType === constants_1.OLD_CONTEXTS_TYPES.ENDPOINTS_GROUP_CONTEXT && elementType === spinal_model_bmsnetwork_1.SpinalBmsEndpoint.nodeTypeName;
+        console.log(isRoomGroup, isEquipementGroup, isEndpointGroup);
+        return isRoomGroup || isEquipementGroup || isEndpointGroup;
     }
     _groupNameExist(nodeId, groupName) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -170,14 +194,14 @@ class SpinalGroup {
     }
     _getGroupRelation(type) {
         let relationName;
-        switch (type) {
-            case spinal_env_viewer_context_geographic_service_1.default.constants.ROOM_TYPE:
+        switch (type.toLowerCase()) {
+            case constants_1.OLD_GROUPS_TYPES.ROOMS_GROUP.toLowerCase():
                 relationName = constants_1.OLD_RELATIONS_TYPES.GROUP_TO_ROOMS_RELATION;
                 break;
-            case spinal_env_viewer_context_geographic_service_1.default.constants.EQUIPMENT_TYPE:
+            case constants_1.OLD_GROUPS_TYPES.EQUIPMENTS_GROUP.toLowerCase():
                 relationName = constants_1.OLD_RELATIONS_TYPES.GROUP_TO_EQUIPMENTS_RELATION;
                 break;
-            case spinal_model_bmsnetwork_1.SpinalBmsEndpoint.nodeTypeName:
+            case constants_1.OLD_GROUPS_TYPES.EQUIPMENTS_GROUP.toLowerCase():
                 relationName = constants_1.OLD_RELATIONS_TYPES.GROUP_TO_ENDPOINT_RELATION;
                 break;
         }

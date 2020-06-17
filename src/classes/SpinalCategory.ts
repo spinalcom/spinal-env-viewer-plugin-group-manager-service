@@ -137,7 +137,7 @@ export default class SpinalCategory {
         const values = Object.values(OLD_CONTEXTS_TYPES);
         if (values.indexOf(type) !== -1) return true;
 
-        return type.includes("GroupContext");
+        return /GroupContext$/.test(type);
     }
 
     private _getRelationRefs(nodeId: string): Promise<any> {
