@@ -16,6 +16,8 @@ export default class GroupManagerService {
     getElementsLinkedToGroup(groupId: string): Promise<any>;
     getGroupCategory(groupId: string): Promise<any>;
     isContext(type: string): boolean;
+    isRoomGroupContext(type: string): boolean;
+    isEquipmentGroupContext(type: string): boolean;
     isCategory(type: string): boolean;
     isGroup(type: string): boolean;
     isRoomsGroup(type: any): boolean;

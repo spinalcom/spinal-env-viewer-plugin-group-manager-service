@@ -146,6 +146,14 @@ export default class GroupManagerService {
         return this.spinalCategory._isContext(type);
     }
 
+    public isRoomGroupContext(type: string): boolean {
+        return type == `${geographicService.constants.ROOM_TYPE}GroupContext` || OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT == type;
+    }
+
+    public isEquipmentGroupContext(type: string): boolean {
+        return type == `${geographicService.constants.EQUIPMENT_TYPE}GroupContext` || OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT == type;
+    }
+
     public isCategory(type: string): boolean {
         return this.spinalCategory._isCategory(type);
     }

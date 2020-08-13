@@ -112,6 +112,12 @@ class GroupManagerService {
     isContext(type) {
         return this.spinalCategory._isContext(type);
     }
+    isRoomGroupContext(type) {
+        return type == `${spinal_env_viewer_context_geographic_service_1.default.constants.ROOM_TYPE}GroupContext` || constants_1.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT == type;
+    }
+    isEquipmentGroupContext(type) {
+        return type == `${spinal_env_viewer_context_geographic_service_1.default.constants.EQUIPMENT_TYPE}GroupContext` || constants_1.OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT == type;
+    }
     isCategory(type) {
         return this.spinalCategory._isCategory(type);
     }
