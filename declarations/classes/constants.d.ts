@@ -1,6 +1,8 @@
 export declare const CATEGORY_TYPE: string;
 export declare const CONTEXT_TO_CATEGORY_RELATION: string;
 export declare const CATEGORY_TO_GROUP_RELATION: string;
+export declare const ELEMENT_LINKED_TO_GROUP_EVENT = "elementLinked";
+export declare const ELEMENT_UNLINKED_TO_GROUP_EVENT = "elementUnLinked";
 export declare const OLD_CONTEXTS_TYPES: Readonly<{
     ROOMS_GROUP_CONTEXT: string;
     EQUIPMENTS_GROUP_CONTEXT: string;
@@ -35,5 +37,7 @@ declare const _default: {
         GROUP_TO_EQUIPMENTS_RELATION: string;
         GROUP_TO_ENDPOINT_RELATION: string;
     }>;
+    ELEMENT_LINKED_TO_GROUP_EVENT: string;
+    ELEMENT_UNLINKED_TO_GROUP_EVENT: string;
 };
 export default _default;

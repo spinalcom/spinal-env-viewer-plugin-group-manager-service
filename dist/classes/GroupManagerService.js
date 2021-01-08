@@ -39,6 +39,7 @@ const spinal_model_bmsnetwork_1 = require("spinal-model-bmsnetwork");
 const SpinalGroup_1 = require("./SpinalGroup");
 const SpinalCategory_1 = require("./SpinalCategory");
 const constants_1 = require("./constants");
+const spinal_env_viewer_plugin_event_emitter_1 = require("spinal-env-viewer-plugin-event-emitter");
 class GroupManagerService {
     constructor() {
         this.constants = constants_1.default;
@@ -91,6 +92,7 @@ class GroupManagerService {
                 result.old_group = group.id.get();
             }
             yield this.spinalGroup.linkElementToGroup(contextId, groupId, elementId);
+            spinal_env_viewer_plugin_event_emitter_1.spinalEventEmitter.emit(constants_1.ELEMENT_LINKED_TO_GROUP_EVENT, { groupId, elementId });
             return result;
         });
     }
@@ -101,7 +103,10 @@ class GroupManagerService {
         return this.spinalCategory.elementIsInCategorie(categoryId, elementId);
     }
     unLinkElementToGroup(groupId, elementId) {
-        return this.spinalGroup.unLinkElementToGroup(groupId, elementId);
+        return this.spinalGroup.unLinkElementToGroup(groupId, elementId).then((result) => {
+            spinal_env_viewer_plugin_event_emitter_1.spinalEventEmitter.emit(constants_1.ELEMENT_UNLINKED_TO_GROUP_EVENT, { groupId, elementId });
+            return result;
+        });
     }
     getElementsLinkedToGroup(groupId) {
         return this.spinalGroup.getElementsLinkedToGroup(groupId);

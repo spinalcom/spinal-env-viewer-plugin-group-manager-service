@@ -33,7 +33,9 @@ import { SpinalBmsEndpoint } from "spinal-model-bmsnetwork";
 import SpinalGroup from "./SpinalGroup";
 import SpinalCategory from "./SpinalCategory";
 
-import constants, { OLD_GROUPS_TYPES, OLD_CONTEXTS_TYPES } from "./constants";
+import constants, { OLD_GROUPS_TYPES, OLD_CONTEXTS_TYPES, ELEMENT_LINKED_TO_GROUP_EVENT, ELEMENT_UNLINKED_TO_GROUP_EVENT } from "./constants";
+
+import { spinalEventEmitter } from "spinal-env-viewer-plugin-event-emitter";
 
 export default class GroupManagerService {
 
@@ -119,6 +121,7 @@ export default class GroupManagerService {
 
         await this.spinalGroup.linkElementToGroup(contextId, groupId, elementId);
 
+        spinalEventEmitter.emit(ELEMENT_LINKED_TO_GROUP_EVENT, { groupId, elementId });
         return result;
     }
 
@@ -131,7 +134,10 @@ export default class GroupManagerService {
     }
 
     public unLinkElementToGroup(groupId: string, elementId: string): Promise<any> {
-        return this.spinalGroup.unLinkElementToGroup(groupId, elementId);
+        return this.spinalGroup.unLinkElementToGroup(groupId, elementId).then((result) => {
+            spinalEventEmitter.emit(ELEMENT_UNLINKED_TO_GROUP_EVENT, { groupId, elementId });
+            return result;
+        })
     }
 
     public getElementsLinkedToGroup(groupId: string): Promise<any> {

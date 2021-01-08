@@ -23,11 +23,19 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+///////////////////////////////////////////
+//            NEW DATA TYPE              //
+///////////////////////////////////////////
 exports.CATEGORY_TYPE = "groupingCategory";
 exports.CONTEXT_TO_CATEGORY_RELATION = "hasCategory";
 exports.CATEGORY_TO_GROUP_RELATION = "hasGroup";
 ///////////////////////////////////////////
-//            OLD DATA                   //
+//            EVENT TYPE                 //
+///////////////////////////////////////////
+exports.ELEMENT_LINKED_TO_GROUP_EVENT = "elementLinked";
+exports.ELEMENT_UNLINKED_TO_GROUP_EVENT = "elementUnLinked";
+///////////////////////////////////////////
+//            OLD DATA TYPE              //
 ///////////////////////////////////////////
 exports.OLD_CONTEXTS_TYPES = Object.freeze({
     ROOMS_GROUP_CONTEXT: "RoomsGroupContext",
@@ -53,6 +61,8 @@ exports.default = {
     CATEGORY_TO_GROUP_RELATION: exports.CATEGORY_TO_GROUP_RELATION,
     OLD_CONTEXTS_TYPES: exports.OLD_CONTEXTS_TYPES,
     OLD_GROUPS_TYPES: exports.OLD_GROUPS_TYPES,
-    OLD_RELATIONS_TYPES: exports.OLD_RELATIONS_TYPES
+    OLD_RELATIONS_TYPES: exports.OLD_RELATIONS_TYPES,
+    ELEMENT_LINKED_TO_GROUP_EVENT: exports.ELEMENT_LINKED_TO_GROUP_EVENT,
+    ELEMENT_UNLINKED_TO_GROUP_EVENT: exports.ELEMENT_UNLINKED_TO_GROUP_EVENT
 };
 //# sourceMappingURL=constants.js.map

@@ -22,16 +22,24 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 
-
+///////////////////////////////////////////
+//            NEW DATA TYPE              //
+///////////////////////////////////////////
 export const CATEGORY_TYPE: string = "groupingCategory";
 
 export const CONTEXT_TO_CATEGORY_RELATION: string = "hasCategory";
 
 export const CATEGORY_TO_GROUP_RELATION: string = "hasGroup";
 
+///////////////////////////////////////////
+//            EVENT TYPE                 //
+///////////////////////////////////////////
+
+export const ELEMENT_LINKED_TO_GROUP_EVENT = "elementLinked"
+export const ELEMENT_UNLINKED_TO_GROUP_EVENT = "elementUnLinked"
 
 ///////////////////////////////////////////
-//            OLD DATA                   //
+//            OLD DATA TYPE              //
 ///////////////////////////////////////////
 export const OLD_CONTEXTS_TYPES = Object.freeze({
     ROOMS_GROUP_CONTEXT: "RoomsGroupContext",
@@ -61,5 +69,7 @@ export default {
     CATEGORY_TO_GROUP_RELATION: CATEGORY_TO_GROUP_RELATION,
     OLD_CONTEXTS_TYPES: OLD_CONTEXTS_TYPES,
     OLD_GROUPS_TYPES: OLD_GROUPS_TYPES,
-    OLD_RELATIONS_TYPES: OLD_RELATIONS_TYPES
+    OLD_RELATIONS_TYPES: OLD_RELATIONS_TYPES,
+    ELEMENT_LINKED_TO_GROUP_EVENT,
+    ELEMENT_UNLINKED_TO_GROUP_EVENT
 }
