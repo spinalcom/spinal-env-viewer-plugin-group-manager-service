@@ -15,7 +15,7 @@
     "spinal-env-viewer-graph-service": "git+https://github.com/spinalcom/Spinal-Graph-Service.git",
     "spinal-model-bmsnetwork": "git+https://github.com/spinalcom/spinal-model-bmsnetwork.git",
     "spinal-env-viewer-context-geographic-service": "git+https://github.com/spinalcom/spinal-env-viewer-context-geographic-service.git",
-    "spinal-env-viewer-plugin-event-emitter" : "git+https://github.com/spinalcom/spinal-env-viewer-plugin-event-emitter.git"
+    "spinal-env-viewer-plugin-event-emitter": "git+https://github.com/spinalcom/spinal-env-viewer-plugin-event-emitter.git"
   },
   "devDependencies": {
     "ts-loader": "^5.4.3",
