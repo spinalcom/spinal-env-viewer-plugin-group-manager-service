@@ -23,6 +23,7 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.OLD_RELATIONS_TYPES = exports.OLD_GROUPS_TYPES = exports.OLD_CONTEXTS_TYPES = exports.ELEMENT_UNLINKED_TO_GROUP_EVENT = exports.ELEMENT_LINKED_TO_GROUP_EVENT = exports.CATEGORY_TO_GROUP_RELATION = exports.CONTEXT_TO_CATEGORY_RELATION = exports.CATEGORY_TYPE = void 0;
 ///////////////////////////////////////////
 //            NEW DATA TYPE              //
 ///////////////////////////////////////////

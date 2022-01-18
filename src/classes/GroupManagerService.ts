@@ -37,6 +37,10 @@ import constants, { OLD_GROUPS_TYPES, OLD_CONTEXTS_TYPES, ELEMENT_LINKED_TO_GROU
 
 import { spinalEventEmitter } from "spinal-env-viewer-plugin-event-emitter";
 
+
+export const spinalGroup: SpinalGroup = new SpinalGroup();;
+export const spinalCategory: SpinalCategory = new SpinalCategory();;
+
 export default class GroupManagerService {
 
     // private typesService: Map<string, string> = new Map(
@@ -47,14 +51,10 @@ export default class GroupManagerService {
     //     ]
     // );
 
-    private spinalGroup: SpinalGroup;
-    private spinalCategory: SpinalCategory;
-    public constants: any = constants;
 
-    constructor() {
-        this.spinalGroup = new SpinalGroup();
-        this.spinalCategory = new SpinalCategory();
-    }
+    public constants = constants;
+
+    constructor() { }
 
     public createGroupContext(contextName: string, childrenType: string): Promise<any> {
         const contextFound = SpinalGraphService.getContext(contextName);
@@ -93,19 +93,19 @@ export default class GroupManagerService {
     }
 
     public addCategory(contextId: string, categoryName: string, iconName: string): Promise<any> {
-        return this.spinalCategory.addCategory(contextId, categoryName, iconName);
+        return spinalCategory.addCategory(contextId, categoryName, iconName);
     }
 
     public getCategories(nodeId: string): Promise<any> {
-        return this.spinalCategory.getCategories(nodeId);
+        return spinalCategory.getCategories(nodeId);
     }
 
     public addGroup(contextId: string, categoryId: string, groupName: string, groupColor: string): Promise<any> {
-        return this.spinalGroup.addGroup(contextId, categoryId, groupName, groupColor);
+        return spinalGroup.addGroup(contextId, categoryId, groupName, groupColor);
     }
 
     public getGroups(nodeId: string): Promise<any> {
-        return this.spinalGroup.getGroups(nodeId);
+        return spinalGroup.getGroups(nodeId);
     }
 
     public async linkElementToGroup(contextId: string, groupId: string, elementId: string): Promise<any> {
@@ -119,37 +119,37 @@ export default class GroupManagerService {
             result.old_group = group.id.get();
         }
 
-        await this.spinalGroup.linkElementToGroup(contextId, groupId, elementId);
+        await spinalGroup.linkElementToGroup(contextId, groupId, elementId);
 
         spinalEventEmitter.emit(ELEMENT_LINKED_TO_GROUP_EVENT, { groupId, elementId });
         return result;
     }
 
     public elementIsLinkedToGroup(groupId: string, elementId: string): Boolean {
-        return this.spinalGroup.elementIsLinkedToGroup(groupId, elementId);
+        return spinalGroup.elementIsLinkedToGroup(groupId, elementId);
     }
 
     public elementIsInCategorie(categoryId: string, elementId: string): Promise<any> {
-        return this.spinalCategory.elementIsInCategorie(categoryId, elementId);
+        return spinalCategory.elementIsInCategorie(categoryId, elementId);
     }
 
     public unLinkElementToGroup(groupId: string, elementId: string): Promise<any> {
-        return this.spinalGroup.unLinkElementToGroup(groupId, elementId).then((result) => {
+        return spinalGroup.unLinkElementToGroup(groupId, elementId).then((result) => {
             spinalEventEmitter.emit(ELEMENT_UNLINKED_TO_GROUP_EVENT, { groupId, elementId });
             return result;
         })
     }
 
     public getElementsLinkedToGroup(groupId: string): Promise<any> {
-        return this.spinalGroup.getElementsLinkedToGroup(groupId);
+        return spinalGroup.getElementsLinkedToGroup(groupId);
     }
 
     public getGroupCategory(groupId: string): Promise<any> {
-        return this.spinalGroup.getCategory(groupId);
+        return spinalGroup.getCategory(groupId);
     }
 
     public isContext(type: string): boolean {
-        return this.spinalCategory._isContext(type);
+        return spinalCategory._isContext(type);
     }
 
     public isRoomGroupContext(type: string): boolean {
@@ -161,11 +161,11 @@ export default class GroupManagerService {
     }
 
     public isCategory(type: string): boolean {
-        return this.spinalCategory._isCategory(type);
+        return spinalCategory._isCategory(type);
     }
 
     public isGroup(type: string): boolean {
-        return this.spinalGroup._isGroup(type);
+        return spinalGroup._isGroup(type);
     }
 
     public isRoomsGroup(type): boolean {
@@ -184,14 +184,14 @@ export default class GroupManagerService {
         name?: string,
         icon?: string
     }): Promise<any> {
-        return this.spinalCategory.updateCategory(categoryId, dataObject);
+        return spinalCategory.updateCategory(categoryId, dataObject);
     }
 
     public updateGroup(categoryId: string, dataObject: {
         name?: string,
         color?: string
     }): Promise<any> {
-        return this.spinalGroup.updateGroup(categoryId, dataObject);
+        return spinalGroup.updateGroup(categoryId, dataObject);
     }
 
 

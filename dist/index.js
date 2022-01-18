@@ -23,7 +23,12 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.constants = exports.spinalCategory = exports.spinalGroup = exports.groupManagerService = void 0;
+const constants_1 = require("./classes/constants");
+exports.constants = constants_1.default;
 const GroupManagerService_1 = require("./classes/GroupManagerService");
+Object.defineProperty(exports, "spinalGroup", { enumerable: true, get: function () { return GroupManagerService_1.spinalGroup; } });
+Object.defineProperty(exports, "spinalCategory", { enumerable: true, get: function () { return GroupManagerService_1.spinalCategory; } });
 let groupManagerService = new GroupManagerService_1.default();
 exports.groupManagerService = groupManagerService;
 exports.default = groupManagerService;

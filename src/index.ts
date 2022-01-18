@@ -25,14 +25,17 @@
 
 
 
-import GroupManagerService from "./classes/GroupManagerService";
+import constants from "./classes/constants";
+import GroupManagerService, { spinalGroup, spinalCategory } from "./classes/GroupManagerService";
 
 
 let groupManagerService = new GroupManagerService();
 
 
 export default groupManagerService;
-
 export {
-    groupManagerService
+    groupManagerService,
+    spinalGroup,
+    spinalCategory,
+    constants
 }

@@ -1,7 +1,30 @@
+import SpinalGroup from "./SpinalGroup";
+import SpinalCategory from "./SpinalCategory";
+export declare const spinalGroup: SpinalGroup;
+export declare const spinalCategory: SpinalCategory;
 export default class GroupManagerService {
-    private spinalGroup;
-    private spinalCategory;
-    constants: any;
+    constants: {
+        CATEGORY_TYPE: string;
+        CONTEXT_TO_CATEGORY_RELATION: string;
+        CATEGORY_TO_GROUP_RELATION: string;
+        OLD_CONTEXTS_TYPES: Readonly<{
+            ROOMS_GROUP_CONTEXT: string;
+            EQUIPMENTS_GROUP_CONTEXT: string;
+            ENDPOINTS_GROUP_CONTEXT: string;
+        }>;
+        OLD_GROUPS_TYPES: Readonly<{
+            ROOMS_GROUP: string;
+            EQUIPMENTS_GROUP: string;
+            ENDPOINT_GROUP: string;
+        }>;
+        OLD_RELATIONS_TYPES: Readonly<{
+            GROUP_TO_ROOMS_RELATION: string;
+            GROUP_TO_EQUIPMENTS_RELATION: string;
+            GROUP_TO_ENDPOINT_RELATION: string;
+        }>;
+        ELEMENT_LINKED_TO_GROUP_EVENT: string;
+        ELEMENT_UNLINKED_TO_GROUP_EVENT: string;
+    };
     constructor();
     createGroupContext(contextName: string, childrenType: string): Promise<any>;
     getGroupContexts(childType?: string): Promise<any>;

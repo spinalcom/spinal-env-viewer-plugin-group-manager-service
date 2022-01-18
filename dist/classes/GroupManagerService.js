@@ -32,6 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.spinalCategory = exports.spinalGroup = void 0;
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
 const spinal_core_connectorjs_type_1 = require("spinal-core-connectorjs_type");
 const spinal_env_viewer_context_geographic_service_1 = require("spinal-env-viewer-context-geographic-service");
@@ -40,11 +41,20 @@ const SpinalGroup_1 = require("./SpinalGroup");
 const SpinalCategory_1 = require("./SpinalCategory");
 const constants_1 = require("./constants");
 const spinal_env_viewer_plugin_event_emitter_1 = require("spinal-env-viewer-plugin-event-emitter");
+exports.spinalGroup = new SpinalGroup_1.default();
+;
+exports.spinalCategory = new SpinalCategory_1.default();
+;
 class GroupManagerService {
     constructor() {
+        // private typesService: Map<string, string> = new Map(
+        //     [
+        //         [geographicService.constants.ROOM_TYPE, `${geographicService.constants.ROOM_TYPE}GroupContext`],
+        //         [BIM_OBJECT_TYPE, `${BIM_OBJECT_TYPE}GroupContext`],
+        //         [SpinalBmsEndpoint.nodeTypeName, `${SpinalBmsEndpoint.nodeTypeName}GroupContext`]
+        //     ]
+        // );
         this.constants = constants_1.default;
-        this.spinalGroup = new SpinalGroup_1.default();
-        this.spinalCategory = new SpinalCategory_1.default();
     }
     createGroupContext(contextName, childrenType) {
         const contextFound = spinal_env_viewer_graph_service_1.SpinalGraphService.getContext(contextName);
@@ -71,16 +81,16 @@ class GroupManagerService {
         });
     }
     addCategory(contextId, categoryName, iconName) {
-        return this.spinalCategory.addCategory(contextId, categoryName, iconName);
+        return exports.spinalCategory.addCategory(contextId, categoryName, iconName);
     }
     getCategories(nodeId) {
-        return this.spinalCategory.getCategories(nodeId);
+        return exports.spinalCategory.getCategories(nodeId);
     }
     addGroup(contextId, categoryId, groupName, groupColor) {
-        return this.spinalGroup.addGroup(contextId, categoryId, groupName, groupColor);
+        return exports.spinalGroup.addGroup(contextId, categoryId, groupName, groupColor);
     }
     getGroups(nodeId) {
-        return this.spinalGroup.getGroups(nodeId);
+        return exports.spinalGroup.getGroups(nodeId);
     }
     linkElementToGroup(contextId, groupId, elementId) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -91,31 +101,31 @@ class GroupManagerService {
                 this.unLinkElementToGroup(group.id.get(), elementId);
                 result.old_group = group.id.get();
             }
-            yield this.spinalGroup.linkElementToGroup(contextId, groupId, elementId);
+            yield exports.spinalGroup.linkElementToGroup(contextId, groupId, elementId);
             spinal_env_viewer_plugin_event_emitter_1.spinalEventEmitter.emit(constants_1.ELEMENT_LINKED_TO_GROUP_EVENT, { groupId, elementId });
             return result;
         });
     }
     elementIsLinkedToGroup(groupId, elementId) {
-        return this.spinalGroup.elementIsLinkedToGroup(groupId, elementId);
+        return exports.spinalGroup.elementIsLinkedToGroup(groupId, elementId);
     }
     elementIsInCategorie(categoryId, elementId) {
-        return this.spinalCategory.elementIsInCategorie(categoryId, elementId);
+        return exports.spinalCategory.elementIsInCategorie(categoryId, elementId);
     }
     unLinkElementToGroup(groupId, elementId) {
-        return this.spinalGroup.unLinkElementToGroup(groupId, elementId).then((result) => {
+        return exports.spinalGroup.unLinkElementToGroup(groupId, elementId).then((result) => {
             spinal_env_viewer_plugin_event_emitter_1.spinalEventEmitter.emit(constants_1.ELEMENT_UNLINKED_TO_GROUP_EVENT, { groupId, elementId });
             return result;
         });
     }
     getElementsLinkedToGroup(groupId) {
-        return this.spinalGroup.getElementsLinkedToGroup(groupId);
+        return exports.spinalGroup.getElementsLinkedToGroup(groupId);
     }
     getGroupCategory(groupId) {
-        return this.spinalGroup.getCategory(groupId);
+        return exports.spinalGroup.getCategory(groupId);
     }
     isContext(type) {
-        return this.spinalCategory._isContext(type);
+        return exports.spinalCategory._isContext(type);
     }
     isRoomGroupContext(type) {
         return type == `${spinal_env_viewer_context_geographic_service_1.default.constants.ROOM_TYPE}GroupContext` || constants_1.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT == type;
@@ -124,10 +134,10 @@ class GroupManagerService {
         return type == `${spinal_env_viewer_context_geographic_service_1.default.constants.EQUIPMENT_TYPE}GroupContext` || constants_1.OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT == type;
     }
     isCategory(type) {
-        return this.spinalCategory._isCategory(type);
+        return exports.spinalCategory._isCategory(type);
     }
     isGroup(type) {
-        return this.spinalGroup._isGroup(type);
+        return exports.spinalGroup._isGroup(type);
     }
     isRoomsGroup(type) {
         return type == `${spinal_env_viewer_context_geographic_service_1.default.constants.ROOM_TYPE}Group` || constants_1.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT.replace("Context", "") == type || type === constants_1.OLD_GROUPS_TYPES.ROOMS_GROUP;
@@ -139,10 +149,10 @@ class GroupManagerService {
         return;
     }
     updateCategory(categoryId, dataObject) {
-        return this.spinalCategory.updateCategory(categoryId, dataObject);
+        return exports.spinalCategory.updateCategory(categoryId, dataObject);
     }
     updateGroup(categoryId, dataObject) {
-        return this.spinalGroup.updateGroup(categoryId, dataObject);
+        return exports.spinalGroup.updateGroup(categoryId, dataObject);
     }
     ////////////////////////////////////////////////////////////////////
     //                      PRIVATES                                  //
