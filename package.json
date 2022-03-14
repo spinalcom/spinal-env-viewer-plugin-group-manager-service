@@ -1,8 +1,9 @@
 {
   "name": "spinal-env-viewer-plugin-group-manager-service",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "",
   "main": "dist/index.js",
+  "types": "declarations",
   "scripts": {
     "build": "rm -fr dist && tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
