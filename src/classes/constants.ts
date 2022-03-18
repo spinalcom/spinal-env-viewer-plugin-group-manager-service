@@ -31,6 +31,12 @@ export const CONTEXT_TO_CATEGORY_RELATION: string = "hasCategory";
 
 export const CATEGORY_TO_GROUP_RELATION: string = "hasGroup";
 
+export const GROUP_RELATION_BEGIN = "groupHas";
+
+export const CONTEXTGROUP_TYPE_END = "GroupContext";
+
+export const GROUP_TYPE_END = "Group";
+
 ///////////////////////////////////////////
 //            EVENT TYPE                 //
 ///////////////////////////////////////////
@@ -64,12 +70,13 @@ export const OLD_RELATIONS_TYPES = Object.freeze({
 ///////////////////////////////////////////
 
 export default {
-    CATEGORY_TYPE: CATEGORY_TYPE,
-    CONTEXT_TO_CATEGORY_RELATION: CONTEXT_TO_CATEGORY_RELATION,
-    CATEGORY_TO_GROUP_RELATION: CATEGORY_TO_GROUP_RELATION,
-    OLD_CONTEXTS_TYPES: OLD_CONTEXTS_TYPES,
-    OLD_GROUPS_TYPES: OLD_GROUPS_TYPES,
-    OLD_RELATIONS_TYPES: OLD_RELATIONS_TYPES,
+    CATEGORY_TYPE,
+    CONTEXT_TO_CATEGORY_RELATION,
+    CATEGORY_TO_GROUP_RELATION,
+    OLD_CONTEXTS_TYPES,
+    OLD_GROUPS_TYPES,
+    OLD_RELATIONS_TYPES,
     ELEMENT_LINKED_TO_GROUP_EVENT,
-    ELEMENT_UNLINKED_TO_GROUP_EVENT
+    ELEMENT_UNLINKED_TO_GROUP_EVENT,
+    GROUP_RELATION_BEGIN
 }

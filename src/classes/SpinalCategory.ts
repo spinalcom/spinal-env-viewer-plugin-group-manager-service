@@ -23,11 +23,13 @@
  */
 
 
-import { SpinalGraphService, SPINAL_RELATION_PTR_LST_TYPE } from "spinal-env-viewer-graph-service";
+import { SpinalGraphService, SpinalNode, SpinalNodeRef, SPINAL_RELATION_PTR_LST_TYPE } from "spinal-env-viewer-graph-service";
 
 import { CATEGORY_TYPE, CONTEXT_TO_CATEGORY_RELATION, CATEGORY_TO_GROUP_RELATION, OLD_CONTEXTS_TYPES } from "./constants";
 
 import { Model } from 'spinal-core-connectorjs_type';
+import { ICategoryInfo } from "../interfaces/ICategoryInfo";
+import { AnySpinalRelation } from "spinal-model-graph";
 
 export default class SpinalCategory {
 
@@ -37,7 +39,7 @@ export default class SpinalCategory {
     constructor() { }
 
 
-    public async addCategory(contextId: string, categoryName: string, iconName: string): Promise<any> {
+    public async addCategory(contextId: string, categoryName: string, iconName: string): Promise<SpinalNode<any>> {
 
         const categoryFound = await this._categoryNameExist(contextId, categoryName);
 
@@ -59,7 +61,7 @@ export default class SpinalCategory {
 
     }
 
-    public getCategories(nodeId: string): Promise<any> {
+    public getCategories(nodeId: string): Promise<SpinalNodeRef[]> {
 
         let nodeInfo = SpinalGraphService.getInfo(nodeId);
 
@@ -81,7 +83,7 @@ export default class SpinalCategory {
 
                 return Promise.all(promises).then((parents: any) => {
                     return parents.map(el => {
-                        return el.info;
+                        return SpinalGraphService.getInfo(el.getId().get());
                     });
                 });
 
@@ -91,7 +93,7 @@ export default class SpinalCategory {
 
     }
 
-    public elementIsInCategorie(categoryId: string, elementId: string): Promise<any> {
+    public elementIsInCategorie(categoryId: string, elementId: string): Promise<SpinalNodeRef> {
         return SpinalGraphService.getChildren(categoryId, [CATEGORY_TO_GROUP_RELATION]).then(children => {
             let itemFound = children.find((child: any) => {
                 return child.childrenIds.find(el => {
@@ -103,15 +105,12 @@ export default class SpinalCategory {
         })
     }
 
-    public async updateCategory(categoryId: string, dataObject: {
-        name?: string,
-        icon?: string
-    }): Promise<any> {
+    public async updateCategory(categoryId: string, newInfo: ICategoryInfo): Promise<SpinalNode<any>> {
         let realNode = SpinalGraphService.getRealNode(categoryId);
 
-        for (const key in dataObject) {
-            if (dataObject.hasOwnProperty(key)) {
-                const value = dataObject[key];
+        for (const key in newInfo) {
+            if (newInfo.hasOwnProperty(key)) {
+                const value = newInfo[key];
                 if (realNode.info[key]) {
                     realNode.info[key].set(value);
                 } else {
@@ -129,18 +128,18 @@ export default class SpinalCategory {
     //                      PRIVATES                                  //
     ////////////////////////////////////////////////////////////////////
 
-    public _isCategory(type: string): any {
+    public _isCategory(type: string): boolean {
         return type === this.CATEGORY_TYPE;
     }
 
-    public _isContext(type: string): any {
-        const values = Object.values(OLD_CONTEXTS_TYPES);
+    public _isContext(type: string): boolean {
+        const values: string[] = Object.values(OLD_CONTEXTS_TYPES);
         if (values.indexOf(type) !== -1) return true;
 
         return /GroupContext$/.test(type);
     }
 
-    private _getRelationRefs(nodeId: string): Promise<any> {
+    private _getRelationRefs(nodeId: string): Promise<AnySpinalRelation[]> {
         let relationRefPromises = [];
 
         let node = SpinalGraphService.getRealNode(nodeId);
@@ -158,15 +157,13 @@ export default class SpinalCategory {
         return Promise.all(relationRefPromises)
     }
 
-    private async _categoryNameExist(nodeId: string, categoryName: string) {
+    private async _categoryNameExist(nodeId: string, categoryName: string): Promise<SpinalNodeRef> {
         const categories = await this.getCategories(nodeId);
 
         for (const category of categories) {
             const name = category.name.get();
             if (name === categoryName) return category;
         }
-
-        return;
     }
 
 }

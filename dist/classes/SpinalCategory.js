@@ -72,7 +72,7 @@ class SpinalCategory {
                 });
                 return Promise.all(promises).then((parents) => {
                     return parents.map(el => {
-                        return el.info;
+                        return spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(el.getId().get());
                     });
                 });
             });
@@ -88,12 +88,12 @@ class SpinalCategory {
             return itemFound;
         });
     }
-    updateCategory(categoryId, dataObject) {
+    updateCategory(categoryId, newInfo) {
         return __awaiter(this, void 0, void 0, function* () {
             let realNode = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(categoryId);
-            for (const key in dataObject) {
-                if (dataObject.hasOwnProperty(key)) {
-                    const value = dataObject[key];
+            for (const key in newInfo) {
+                if (newInfo.hasOwnProperty(key)) {
+                    const value = newInfo[key];
                     if (realNode.info[key]) {
                         realNode.info[key].set(value);
                     }
@@ -139,7 +139,6 @@ class SpinalCategory {
                 if (name === categoryName)
                     return category;
             }
-            return;
         });
     }
 }

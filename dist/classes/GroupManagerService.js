@@ -47,26 +47,20 @@ exports.spinalCategory = new SpinalCategory_1.default();
 ;
 class GroupManagerService {
     constructor() {
-        // private typesService: Map<string, string> = new Map(
-        //     [
-        //         [geographicService.constants.ROOM_TYPE, `${geographicService.constants.ROOM_TYPE}GroupContext`],
-        //         [BIM_OBJECT_TYPE, `${BIM_OBJECT_TYPE}GroupContext`],
-        //         [SpinalBmsEndpoint.nodeTypeName, `${SpinalBmsEndpoint.nodeTypeName}GroupContext`]
-        //     ]
-        // );
         this.constants = constants_1.default;
     }
     createGroupContext(contextName, childrenType) {
         const contextFound = spinal_env_viewer_graph_service_1.SpinalGraphService.getContext(contextName);
         if (typeof contextFound !== "undefined")
             return Promise.resolve(contextFound);
-        return spinal_env_viewer_graph_service_1.SpinalGraphService.addContext(contextName, `${childrenType}GroupContext`, new spinal_core_connectorjs_type_1.Model({
+        return spinal_env_viewer_graph_service_1.SpinalGraphService.addContext(contextName, `${childrenType}${constants_1.CONTEXTGROUP_TYPE_END}`, new spinal_core_connectorjs_type_1.Model({
             name: contextName,
             childType: childrenType
         }));
     }
-    getGroupContexts(childType) {
-        let graphId = spinal_env_viewer_graph_service_1.SpinalGraphService.getGraph().getId().get();
+    getGroupContexts(childType, graph) {
+        graph = graph || spinal_env_viewer_graph_service_1.SpinalGraphService.getGraph();
+        let graphId = graph.getId().get();
         return spinal_env_viewer_graph_service_1.SpinalGraphService.getChildren(graphId).then(contextsModel => {
             let contexts = contextsModel.map(el => el.get());
             let allGroupContexts = contexts.filter(el => {
@@ -128,10 +122,10 @@ class GroupManagerService {
         return exports.spinalCategory._isContext(type);
     }
     isRoomGroupContext(type) {
-        return type == `${spinal_env_viewer_context_geographic_service_1.default.constants.ROOM_TYPE}GroupContext` || constants_1.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT == type;
+        return type == `${spinal_env_viewer_context_geographic_service_1.default.constants.ROOM_TYPE}${constants_1.CONTEXTGROUP_TYPE_END}` || constants_1.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT == type;
     }
     isEquipmentGroupContext(type) {
-        return type == `${spinal_env_viewer_context_geographic_service_1.default.constants.EQUIPMENT_TYPE}GroupContext` || constants_1.OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT == type;
+        return type == `${spinal_env_viewer_context_geographic_service_1.default.constants.EQUIPMENT_TYPE}${constants_1.CONTEXTGROUP_TYPE_END}` || constants_1.OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT == type;
     }
     isCategory(type) {
         return exports.spinalCategory._isCategory(type);
@@ -140,19 +134,28 @@ class GroupManagerService {
         return exports.spinalGroup._isGroup(type);
     }
     isRoomsGroup(type) {
-        return type == `${spinal_env_viewer_context_geographic_service_1.default.constants.ROOM_TYPE}Group` || constants_1.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT.replace("Context", "") == type || type === constants_1.OLD_GROUPS_TYPES.ROOMS_GROUP;
+        return type == `${spinal_env_viewer_context_geographic_service_1.default.constants.ROOM_TYPE}${constants_1.GROUP_TYPE_END}` || constants_1.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT.replace("Context", "") == type || type === constants_1.OLD_GROUPS_TYPES.ROOMS_GROUP;
     }
     isEquipementGroup(type) {
-        return type == `${spinal_env_viewer_context_geographic_service_1.default.constants.EQUIPMENT_TYPE}Group` || constants_1.OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT.replace("Context", "") == type || type === constants_1.OLD_GROUPS_TYPES.EQUIPMENTS_GROUP;
+        return type == `${spinal_env_viewer_context_geographic_service_1.default.constants.EQUIPMENT_TYPE}${constants_1.GROUP_TYPE_END}` || constants_1.OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT.replace("Context", "") == type || type === constants_1.OLD_GROUPS_TYPES.EQUIPMENTS_GROUP;
     }
-    isEndpointGroup(type) {
-        return;
+    checkGroupType(groupType, childrenType) {
+        return `${childrenType}${constants_1.GROUP_TYPE_END}` === groupType;
     }
-    updateCategory(categoryId, dataObject) {
-        return exports.spinalCategory.updateCategory(categoryId, dataObject);
+    checkContextType(contextType, childrenType) {
+        return `${childrenType}${constants_1.CONTEXTGROUP_TYPE_END}` === contextType;
     }
-    updateGroup(categoryId, dataObject) {
-        return exports.spinalGroup.updateGroup(categoryId, dataObject);
+    updateCategory(categoryId, newInfo) {
+        return exports.spinalCategory.updateCategory(categoryId, newInfo);
+    }
+    updateGroup(categoryId, newInfo) {
+        return exports.spinalGroup.updateGroup(categoryId, newInfo);
+    }
+    getChildrenType(type) {
+        if (this.isContext(type))
+            return type.replace(constants_1.CONTEXTGROUP_TYPE_END, "");
+        if (this.isGroup(type))
+            return type.replace(constants_1.GROUP_TYPE_END, "");
     }
     ////////////////////////////////////////////////////////////////////
     //                      PRIVATES                                  //

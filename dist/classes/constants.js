@@ -23,13 +23,16 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OLD_RELATIONS_TYPES = exports.OLD_GROUPS_TYPES = exports.OLD_CONTEXTS_TYPES = exports.ELEMENT_UNLINKED_TO_GROUP_EVENT = exports.ELEMENT_LINKED_TO_GROUP_EVENT = exports.CATEGORY_TO_GROUP_RELATION = exports.CONTEXT_TO_CATEGORY_RELATION = exports.CATEGORY_TYPE = void 0;
+exports.OLD_RELATIONS_TYPES = exports.OLD_GROUPS_TYPES = exports.OLD_CONTEXTS_TYPES = exports.ELEMENT_UNLINKED_TO_GROUP_EVENT = exports.ELEMENT_LINKED_TO_GROUP_EVENT = exports.GROUP_TYPE_END = exports.CONTEXTGROUP_TYPE_END = exports.GROUP_RELATION_BEGIN = exports.CATEGORY_TO_GROUP_RELATION = exports.CONTEXT_TO_CATEGORY_RELATION = exports.CATEGORY_TYPE = void 0;
 ///////////////////////////////////////////
 //            NEW DATA TYPE              //
 ///////////////////////////////////////////
 exports.CATEGORY_TYPE = "groupingCategory";
 exports.CONTEXT_TO_CATEGORY_RELATION = "hasCategory";
 exports.CATEGORY_TO_GROUP_RELATION = "hasGroup";
+exports.GROUP_RELATION_BEGIN = "groupHas";
+exports.CONTEXTGROUP_TYPE_END = "GroupContext";
+exports.GROUP_TYPE_END = "Group";
 ///////////////////////////////////////////
 //            EVENT TYPE                 //
 ///////////////////////////////////////////
@@ -64,6 +67,7 @@ exports.default = {
     OLD_GROUPS_TYPES: exports.OLD_GROUPS_TYPES,
     OLD_RELATIONS_TYPES: exports.OLD_RELATIONS_TYPES,
     ELEMENT_LINKED_TO_GROUP_EVENT: exports.ELEMENT_LINKED_TO_GROUP_EVENT,
-    ELEMENT_UNLINKED_TO_GROUP_EVENT: exports.ELEMENT_UNLINKED_TO_GROUP_EVENT
+    ELEMENT_UNLINKED_TO_GROUP_EVENT: exports.ELEMENT_UNLINKED_TO_GROUP_EVENT,
+    GROUP_RELATION_BEGIN: exports.GROUP_RELATION_BEGIN
 };
 //# sourceMappingURL=constants.js.map

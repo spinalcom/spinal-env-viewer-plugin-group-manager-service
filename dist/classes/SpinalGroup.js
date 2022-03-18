@@ -40,7 +40,7 @@ const spinal_model_bmsnetwork_1 = require("spinal-model-bmsnetwork");
 class SpinalGroup {
     constructor() {
         this.CATEGORY_TO_GROUP_RELATION = constants_1.CATEGORY_TO_GROUP_RELATION;
-        this.RELATION_BEGIN = "groupHas";
+        this.RELATION_BEGIN = constants_1.GROUP_RELATION_BEGIN;
     }
     addGroup(contextId, categoryId, groupName, groupColor) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -60,7 +60,7 @@ class SpinalGroup {
                 }));
                 return spinal_env_viewer_graph_service_1.SpinalGraphService.addChildInContext(categoryId, childId, contextId, this.CATEGORY_TO_GROUP_RELATION, spinal_env_viewer_graph_service_1.SPINAL_RELATION_PTR_LST_TYPE);
             }
-            return Promise.resolve(false);
+            // return Promise.resolve(false);
         });
     }
     linkElementToGroup(contextId, groupId, elementId) {
@@ -118,7 +118,7 @@ class SpinalGroup {
         }).then(res => {
             return res.map(el => {
                 spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(el);
-                return el.info;
+                return spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(el.getId().get());
             });
         });
     }
@@ -129,12 +129,12 @@ class SpinalGroup {
                 return parents[0];
         });
     }
-    updateGroup(groupId, dataObject) {
+    updateGroup(groupId, newInfo) {
         return __awaiter(this, void 0, void 0, function* () {
             let realNode = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(groupId);
-            for (const key in dataObject) {
-                if (dataObject.hasOwnProperty(key)) {
-                    const value = dataObject[key];
+            for (const key in newInfo) {
+                if (newInfo.hasOwnProperty(key)) {
+                    const value = newInfo[key];
                     if (realNode.info[key]) {
                         realNode.info[key].set(value);
                     }
@@ -145,13 +145,16 @@ class SpinalGroup {
                     }
                 }
             }
-            return realNode;
+            return spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(realNode.getId().get());
         });
     }
     _isGroup(type) {
         // let stringEnd = type.substr(type.length - 5);
         // return stringEnd === "Group";
         return /Group$/.test(type);
+    }
+    checkGroupType(groupType, childrenType) {
+        return groupType === `${childrenType}Group`;
     }
     ////////////////////////////////////////////////////////////////////
     //                      PRIVATES                                  //
@@ -189,7 +192,6 @@ class SpinalGroup {
                 if (name === groupName)
                     return group;
             }
-            return;
         });
     }
     _getGroupRelation(type) {

@@ -23,7 +23,7 @@
  */
 
 
-import { SpinalGraphService } from "spinal-env-viewer-graph-service";
+import { SpinalGraphService, SpinalGraph, SpinalContext, SpinalNode, SpinalNodeRef } from "spinal-env-viewer-graph-service";
 
 import { Model } from 'spinal-core-connectorjs_type';
 
@@ -33,9 +33,12 @@ import { SpinalBmsEndpoint } from "spinal-model-bmsnetwork";
 import SpinalGroup from "./SpinalGroup";
 import SpinalCategory from "./SpinalCategory";
 
-import constants, { OLD_GROUPS_TYPES, OLD_CONTEXTS_TYPES, ELEMENT_LINKED_TO_GROUP_EVENT, ELEMENT_UNLINKED_TO_GROUP_EVENT } from "./constants";
+import constants, { OLD_GROUPS_TYPES, OLD_CONTEXTS_TYPES, ELEMENT_LINKED_TO_GROUP_EVENT, ELEMENT_UNLINKED_TO_GROUP_EVENT, CONTEXTGROUP_TYPE_END, GROUP_TYPE_END } from "./constants";
 
 import { spinalEventEmitter } from "spinal-env-viewer-plugin-event-emitter";
+import { INodeRefObj } from "../interfaces/INodeRefObj";
+import { IGroupInfo } from "../interfaces/IGroupInfo";
+import { ICategoryInfo } from "../interfaces/ICategoryInfo";
 
 
 export const spinalGroup: SpinalGroup = new SpinalGroup();;
@@ -43,25 +46,18 @@ export const spinalCategory: SpinalCategory = new SpinalCategory();;
 
 export default class GroupManagerService {
 
-    // private typesService: Map<string, string> = new Map(
-    //     [
-    //         [geographicService.constants.ROOM_TYPE, `${geographicService.constants.ROOM_TYPE}GroupContext`],
-    //         [BIM_OBJECT_TYPE, `${BIM_OBJECT_TYPE}GroupContext`],
-    //         [SpinalBmsEndpoint.nodeTypeName, `${SpinalBmsEndpoint.nodeTypeName}GroupContext`]
-    //     ]
-    // );
 
 
     public constants = constants;
 
     constructor() { }
 
-    public createGroupContext(contextName: string, childrenType: string): Promise<any> {
+    public createGroupContext(contextName: string, childrenType: string): Promise<SpinalContext<any>> {
         const contextFound = SpinalGraphService.getContext(contextName);
 
         if (typeof contextFound !== "undefined") return Promise.resolve(contextFound);
 
-        return SpinalGraphService.addContext(contextName, `${childrenType}GroupContext`,
+        return SpinalGraphService.addContext(contextName, `${childrenType}${CONTEXTGROUP_TYPE_END}`,
             new Model({
                 name: contextName,
                 childType: childrenType
@@ -69,9 +65,9 @@ export default class GroupManagerService {
 
     }
 
-    public getGroupContexts(childType?: string): Promise<any> {
-
-        let graphId = SpinalGraphService.getGraph().getId().get();
+    public getGroupContexts(childType?: string, graph?: SpinalGraph<any>): Promise<INodeRefObj[]> {
+        graph = graph || SpinalGraphService.getGraph()
+        let graphId = graph.getId().get();
 
         return SpinalGraphService.getChildren(graphId).then(contextsModel => {
 
@@ -92,23 +88,23 @@ export default class GroupManagerService {
         })
     }
 
-    public addCategory(contextId: string, categoryName: string, iconName: string): Promise<any> {
+    public addCategory(contextId: string, categoryName: string, iconName: string): Promise<SpinalNode<any>> {
         return spinalCategory.addCategory(contextId, categoryName, iconName);
     }
 
-    public getCategories(nodeId: string): Promise<any> {
+    public getCategories(nodeId: string): Promise<SpinalNodeRef[]> {
         return spinalCategory.getCategories(nodeId);
     }
 
-    public addGroup(contextId: string, categoryId: string, groupName: string, groupColor: string): Promise<any> {
+    public addGroup(contextId: string, categoryId: string, groupName: string, groupColor: string): Promise<SpinalNode<any>> {
         return spinalGroup.addGroup(contextId, categoryId, groupName, groupColor);
     }
 
-    public getGroups(nodeId: string): Promise<any> {
+    public getGroups(nodeId: string): Promise<SpinalNodeRef[]> {
         return spinalGroup.getGroups(nodeId);
     }
 
-    public async linkElementToGroup(contextId: string, groupId: string, elementId: string): Promise<any> {
+    public async linkElementToGroup(contextId: string, groupId: string, elementId: string): Promise<{ old_group: string, newGroup: string }> {
 
         const category = await this.getGroupCategory(groupId);
         const group = await this.elementIsInCategorie(category.id.get(), elementId);
@@ -125,26 +121,26 @@ export default class GroupManagerService {
         return result;
     }
 
-    public elementIsLinkedToGroup(groupId: string, elementId: string): Boolean {
+    public elementIsLinkedToGroup(groupId: string, elementId: string): boolean {
         return spinalGroup.elementIsLinkedToGroup(groupId, elementId);
     }
 
-    public elementIsInCategorie(categoryId: string, elementId: string): Promise<any> {
+    public elementIsInCategorie(categoryId: string, elementId: string): Promise<SpinalNodeRef> {
         return spinalCategory.elementIsInCategorie(categoryId, elementId);
     }
 
-    public unLinkElementToGroup(groupId: string, elementId: string): Promise<any> {
+    public unLinkElementToGroup(groupId: string, elementId: string): Promise<boolean> {
         return spinalGroup.unLinkElementToGroup(groupId, elementId).then((result) => {
             spinalEventEmitter.emit(ELEMENT_UNLINKED_TO_GROUP_EVENT, { groupId, elementId });
             return result;
         })
     }
 
-    public getElementsLinkedToGroup(groupId: string): Promise<any> {
+    public getElementsLinkedToGroup(groupId: string): Promise<SpinalNodeRef[]> {
         return spinalGroup.getElementsLinkedToGroup(groupId);
     }
 
-    public getGroupCategory(groupId: string): Promise<any> {
+    public getGroupCategory(groupId: string): Promise<SpinalNodeRef> {
         return spinalGroup.getCategory(groupId);
     }
 
@@ -153,11 +149,11 @@ export default class GroupManagerService {
     }
 
     public isRoomGroupContext(type: string): boolean {
-        return type == `${geographicService.constants.ROOM_TYPE}GroupContext` || OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT == type;
+        return type == `${geographicService.constants.ROOM_TYPE}${CONTEXTGROUP_TYPE_END}` || OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT == type;
     }
 
     public isEquipmentGroupContext(type: string): boolean {
-        return type == `${geographicService.constants.EQUIPMENT_TYPE}GroupContext` || OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT == type;
+        return type == `${geographicService.constants.EQUIPMENT_TYPE}${CONTEXTGROUP_TYPE_END}` || OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT == type;
     }
 
     public isCategory(type: string): boolean {
@@ -168,30 +164,33 @@ export default class GroupManagerService {
         return spinalGroup._isGroup(type);
     }
 
-    public isRoomsGroup(type): boolean {
-        return type == `${geographicService.constants.ROOM_TYPE}Group` || OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT.replace("Context", "") == type || type === OLD_GROUPS_TYPES.ROOMS_GROUP;
+    public isRoomsGroup(type: string): boolean {
+        return type == `${geographicService.constants.ROOM_TYPE}${GROUP_TYPE_END}` || OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT.replace("Context", "") == type || type === OLD_GROUPS_TYPES.ROOMS_GROUP;
     }
 
-    public isEquipementGroup(type): boolean {
-        return type == `${geographicService.constants.EQUIPMENT_TYPE}Group` || OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT.replace("Context", "") == type || type === OLD_GROUPS_TYPES.EQUIPMENTS_GROUP;
+    public isEquipementGroup(type: string): boolean {
+        return type == `${geographicService.constants.EQUIPMENT_TYPE}${GROUP_TYPE_END}` || OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT.replace("Context", "") == type || type === OLD_GROUPS_TYPES.EQUIPMENTS_GROUP;
     }
 
-    public isEndpointGroup(type): boolean {
-        return;
+    public checkGroupType(groupType: string, childrenType: string): boolean {
+        return `${childrenType}${GROUP_TYPE_END}` === groupType;
     }
 
-    public updateCategory(categoryId: string, dataObject: {
-        name?: string,
-        icon?: string
-    }): Promise<any> {
-        return spinalCategory.updateCategory(categoryId, dataObject);
+    public checkContextType(contextType: string, childrenType: string): boolean {
+        return `${childrenType}${CONTEXTGROUP_TYPE_END}` === contextType;
     }
 
-    public updateGroup(categoryId: string, dataObject: {
-        name?: string,
-        color?: string
-    }): Promise<any> {
-        return spinalGroup.updateGroup(categoryId, dataObject);
+    public updateCategory(categoryId: string, newInfo: ICategoryInfo): Promise<SpinalNode<any>> {
+        return spinalCategory.updateCategory(categoryId, newInfo);
+    }
+
+    public updateGroup(categoryId: string, newInfo: IGroupInfo): Promise<SpinalNodeRef> {
+        return spinalGroup.updateGroup(categoryId, newInfo);
+    }
+
+    public getChildrenType(type: string): string {
+        if (this.isContext(type)) return type.replace(CONTEXTGROUP_TYPE_END, "");
+        if (this.isGroup(type)) return type.replace(GROUP_TYPE_END, "");
     }
 
 
@@ -199,7 +198,7 @@ export default class GroupManagerService {
     //                      PRIVATES                                  //
     ////////////////////////////////////////////////////////////////////
 
-    private _getOldTypes(type) {
+    private _getOldTypes(type): string {
         switch (type) {
             case geographicService.constants.ROOM_TYPE:
                 return this.constants.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT;

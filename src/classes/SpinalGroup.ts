@@ -23,24 +23,25 @@
  */
 
 
-import { SpinalGraphService, SPINAL_RELATION_PTR_LST_TYPE, SPINAL_RELATION_LST_PTR_TYPE } from "spinal-env-viewer-graph-service"
+import { SpinalGraphService, SPINAL_RELATION_PTR_LST_TYPE, SPINAL_RELATION_LST_PTR_TYPE, SpinalNode, SpinalNodeRef } from "spinal-env-viewer-graph-service"
 
-import { CATEGORY_TO_GROUP_RELATION, CONTEXT_TO_CATEGORY_RELATION, OLD_RELATIONS_TYPES, OLD_GROUPS_TYPES, OLD_CONTEXTS_TYPES } from "./constants";
+import { CATEGORY_TO_GROUP_RELATION, CONTEXT_TO_CATEGORY_RELATION, OLD_RELATIONS_TYPES, OLD_GROUPS_TYPES, OLD_CONTEXTS_TYPES, GROUP_RELATION_BEGIN } from "./constants";
 
 import { Model } from 'spinal-core-connectorjs_type';
 
 import geographicService from 'spinal-env-viewer-context-geographic-service';
 import { SpinalBmsEndpoint } from "spinal-model-bmsnetwork";
+import { IGroupInfo } from "../interfaces/IGroupInfo";
 
 export default class SpinalGroup {
 
-    CATEGORY_TO_GROUP_RELATION: string = CATEGORY_TO_GROUP_RELATION;
-    RELATION_BEGIN: string = "groupHas";
+    public CATEGORY_TO_GROUP_RELATION: string = CATEGORY_TO_GROUP_RELATION;
+    public RELATION_BEGIN: string = GROUP_RELATION_BEGIN;
 
     constructor() { }
 
 
-    public async addGroup(contextId: string, categoryId: string, groupName: string, groupColor: string): Promise<any> {
+    public async addGroup(contextId: string, categoryId: string, groupName: string, groupColor: string): Promise<SpinalNode<any>> {
 
 
         const groupFound = await this._groupNameExist(categoryId, groupName);
@@ -68,10 +69,10 @@ export default class SpinalGroup {
         }
 
 
-        return Promise.resolve(false);
+        // return Promise.resolve(false);
     }
 
-    public async linkElementToGroup(contextId: string, groupId: string, elementId: string): Promise<any> {
+    public async linkElementToGroup(contextId: string, groupId: string, elementId: string): Promise<SpinalNode<any>> {
         let contextInfo = SpinalGraphService.getInfo(contextId);
         let elementInfo = SpinalGraphService.getInfo(elementId);
 
@@ -86,12 +87,12 @@ export default class SpinalGroup {
         throw Error(`${elementInfo.type.get()} cannot be linked to this group.`);
     }
 
-    public elementIsLinkedToGroup(groupId: string, elementId: string): Boolean {
+    public elementIsLinkedToGroup(groupId: string, elementId: string): boolean {
         let childrenIds = SpinalGraphService.getChildrenIds(groupId);
         return childrenIds.indexOf(elementId) !== -1;
     }
 
-    public unLinkElementToGroup(groupId: string, elementId: string): Promise<any> {
+    public unLinkElementToGroup(groupId: string, elementId: string): Promise<boolean> {
         let elementInfo = SpinalGraphService.getInfo(elementId);
 
         let relationName = `${this.RELATION_BEGIN}${elementInfo.type.get()}`;
@@ -106,7 +107,7 @@ export default class SpinalGroup {
     }
 
 
-    public getElementsLinkedToGroup(groupId: string): Promise<any> {
+    public getElementsLinkedToGroup(groupId: string): Promise<SpinalNodeRef[]> {
         let groupInfo = SpinalGraphService.getInfo(groupId);
 
         let type = this._getChildrenType(groupInfo.type.get());
@@ -121,7 +122,7 @@ export default class SpinalGroup {
     }
 
 
-    public getGroups(nodeId: string): Promise<any> {
+    public getGroups(nodeId: string): Promise<SpinalNodeRef[]> {
         let nodeInfo = SpinalGraphService.getInfo(nodeId);
 
         if (this._isGroup(nodeInfo.type.get())) {
@@ -143,26 +144,23 @@ export default class SpinalGroup {
         }).then(res => {
             return res.map(el => {
                 (<any>SpinalGraphService)._addNode(el);
-                return el.info;
+                return SpinalGraphService.getInfo(el.getId().get());
             })
         })
 
     }
 
-    public async getCategory(groupId: string): Promise<any> {
+    public async getCategory(groupId: string): Promise<SpinalNodeRef> {
         const parents = await SpinalGraphService.getParents(groupId, this.CATEGORY_TO_GROUP_RELATION);
         if (parents.length > 0) return parents[0];
     }
 
-    public async updateGroup(groupId: string, dataObject: {
-        name?: string,
-        color?: string
-    }): Promise<any> {
+    public async updateGroup(groupId: string, newInfo: IGroupInfo): Promise<SpinalNodeRef> {
         let realNode = SpinalGraphService.getRealNode(groupId);
 
-        for (const key in dataObject) {
-            if (dataObject.hasOwnProperty(key)) {
-                const value = dataObject[key];
+        for (const key in newInfo) {
+            if (newInfo.hasOwnProperty(key)) {
+                const value = newInfo[key];
                 if (realNode.info[key]) {
                     realNode.info[key].set(value);
                 } else {
@@ -173,16 +171,20 @@ export default class SpinalGroup {
             }
         }
 
-        return realNode;
+        return SpinalGraphService.getInfo(realNode.getId().get());
     }
 
-    public _isGroup(type: string) {
+    public _isGroup(type: string): boolean {
 
         // let stringEnd = type.substr(type.length - 5);
 
         // return stringEnd === "Group";
 
         return /Group$/.test(type);
+    }
+
+    public checkGroupType(groupType: string, childrenType: string): boolean {
+        return groupType === `${childrenType}Group`;
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -218,7 +220,7 @@ export default class SpinalGroup {
 
     }
 
-    private _isOldGroup(contextType: string, elementType: string) {
+    private _isOldGroup(contextType: string, elementType: string): boolean {
 
         const isRoomGroup = contextType === OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT && elementType === geographicService.constants.ROOM_TYPE;
         const isEquipementGroup = contextType === OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT && elementType === geographicService.constants.EQUIPMENT_TYPE;
@@ -230,7 +232,7 @@ export default class SpinalGroup {
 
     }
 
-    private async _groupNameExist(nodeId: string, groupName: string) {
+    private async _groupNameExist(nodeId: string, groupName: string): Promise<SpinalNodeRef> {
         const groups = await this.getGroups(nodeId);
 
         for (const group of groups) {
@@ -238,7 +240,6 @@ export default class SpinalGroup {
             if (name === groupName) return group;
         }
 
-        return;
     }
 
     private _getGroupRelation(type: string | String): string {

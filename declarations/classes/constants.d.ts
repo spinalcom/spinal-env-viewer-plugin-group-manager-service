@@ -1,6 +1,9 @@
 export declare const CATEGORY_TYPE: string;
 export declare const CONTEXT_TO_CATEGORY_RELATION: string;
 export declare const CATEGORY_TO_GROUP_RELATION: string;
+export declare const GROUP_RELATION_BEGIN = "groupHas";
+export declare const CONTEXTGROUP_TYPE_END = "GroupContext";
+export declare const GROUP_TYPE_END = "Group";
 export declare const ELEMENT_LINKED_TO_GROUP_EVENT = "elementLinked";
 export declare const ELEMENT_UNLINKED_TO_GROUP_EVENT = "elementUnLinked";
 export declare const OLD_CONTEXTS_TYPES: Readonly<{
@@ -39,5 +42,6 @@ declare const _default: {
     }>;
     ELEMENT_LINKED_TO_GROUP_EVENT: string;
     ELEMENT_UNLINKED_TO_GROUP_EVENT: string;
+    GROUP_RELATION_BEGIN: string;
 };
 export default _default;
