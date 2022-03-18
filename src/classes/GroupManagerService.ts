@@ -52,10 +52,12 @@ export default class GroupManagerService {
 
     constructor() { }
 
-    public createGroupContext(contextName: string, childrenType: string): Promise<SpinalContext<any>> {
-        const contextFound = SpinalGraphService.getContext(contextName);
+    public async createGroupContext(contextName: string, childrenType: string, graph?: SpinalGraph<any>): Promise<SpinalContext<any>> {
+        const contexts = await this._getContexts(graph);
 
-        if (typeof contextFound !== "undefined") return Promise.resolve(contextFound);
+        let contextFound = contexts.find(context => context.name.get() === contextName);
+
+        if (typeof contextFound !== "undefined") return Promise.resolve(SpinalGraphService.getRealNode(contextFound.id.get()));
 
         return SpinalGraphService.addContext(contextName, `${childrenType}${CONTEXTGROUP_TYPE_END}`,
             new Model({
@@ -74,7 +76,7 @@ export default class GroupManagerService {
             let contexts = contextsModel.map(el => el.get());
 
             let allGroupContexts = contexts.filter(el => {
-                return el.type.includes("GroupContext");
+                return el.type.includes(CONTEXTGROUP_TYPE_END);
             })
 
             if (typeof childType === "undefined") return allGroupContexts;
@@ -211,5 +213,16 @@ export default class GroupManagerService {
         }
     }
 
+
+    private _getContexts(graph?: SpinalGraph<any>): Promise<SpinalNodeRef[]> {
+        graph = graph || SpinalGraphService.getGraph();
+        //@ts-ignore
+        SpinalGraphService._addNode(graph);
+        let graphId = graph.getId().get();
+
+        return SpinalGraphService.getChildren(graphId).then(contextsModel => {
+            return contextsModel;
+        })
+    }
 
 }

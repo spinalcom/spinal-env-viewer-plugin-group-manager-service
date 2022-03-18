@@ -49,14 +49,17 @@ class GroupManagerService {
     constructor() {
         this.constants = constants_1.default;
     }
-    createGroupContext(contextName, childrenType) {
-        const contextFound = spinal_env_viewer_graph_service_1.SpinalGraphService.getContext(contextName);
-        if (typeof contextFound !== "undefined")
-            return Promise.resolve(contextFound);
-        return spinal_env_viewer_graph_service_1.SpinalGraphService.addContext(contextName, `${childrenType}${constants_1.CONTEXTGROUP_TYPE_END}`, new spinal_core_connectorjs_type_1.Model({
-            name: contextName,
-            childType: childrenType
-        }));
+    createGroupContext(contextName, childrenType, graph) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const contexts = yield this._getContexts(graph);
+            let contextFound = contexts.find(context => context.name.get() === contextName);
+            if (typeof contextFound !== "undefined")
+                return Promise.resolve(spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(contextFound.id.get()));
+            return spinal_env_viewer_graph_service_1.SpinalGraphService.addContext(contextName, `${childrenType}${constants_1.CONTEXTGROUP_TYPE_END}`, new spinal_core_connectorjs_type_1.Model({
+                name: contextName,
+                childType: childrenType
+            }));
+        });
     }
     getGroupContexts(childType, graph) {
         graph = graph || spinal_env_viewer_graph_service_1.SpinalGraphService.getGraph();
@@ -64,7 +67,7 @@ class GroupManagerService {
         return spinal_env_viewer_graph_service_1.SpinalGraphService.getChildren(graphId).then(contextsModel => {
             let contexts = contextsModel.map(el => el.get());
             let allGroupContexts = contexts.filter(el => {
-                return el.type.includes("GroupContext");
+                return el.type.includes(constants_1.CONTEXTGROUP_TYPE_END);
             });
             if (typeof childType === "undefined")
                 return allGroupContexts;
@@ -169,6 +172,15 @@ class GroupManagerService {
             case spinal_model_bmsnetwork_1.SpinalBmsEndpoint.nodeTypeName:
                 return this.constants.OLD_CONTEXTS_TYPES.ENDPOINTS_GROUP_CONTEXT;
         }
+    }
+    _getContexts(graph) {
+        graph = graph || spinal_env_viewer_graph_service_1.SpinalGraphService.getGraph();
+        //@ts-ignore
+        spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(graph);
+        let graphId = graph.getId().get();
+        return spinal_env_viewer_graph_service_1.SpinalGraphService.getChildren(graphId).then(contextsModel => {
+            return contextsModel;
+        });
     }
 }
 exports.default = GroupManagerService;
