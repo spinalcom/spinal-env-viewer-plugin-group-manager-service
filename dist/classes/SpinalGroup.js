@@ -70,7 +70,7 @@ class SpinalGroup {
             if (contextInfo && elementInfo) {
                 let childrenType = this._getChildrenType(contextInfo.type.get());
                 if (childrenType === elementInfo.type.get() || this._isOldGroup(contextInfo.type.get(), elementInfo.type.get()))
-                    return spinal_env_viewer_graph_service_1.SpinalGraphService.addChildInContext(groupId, elementId, contextId, `${this.RELATION_BEGIN}${elementInfo.type.get()}`, spinal_env_viewer_graph_service_1.SPINAL_RELATION_LST_PTR_TYPE);
+                    return spinal_env_viewer_graph_service_1.SpinalGraphService.addChildInContext(groupId, elementId, contextId, `${this.RELATION_BEGIN}${elementInfo.type.get()}`, spinal_env_viewer_graph_service_1.SPINAL_RELATION_PTR_LST_TYPE);
             }
             throw Error(`${elementInfo.type.get()} cannot be linked to this group.`);
         });
@@ -80,9 +80,16 @@ class SpinalGroup {
         return childrenIds.indexOf(elementId) !== -1;
     }
     unLinkElementToGroup(groupId, elementId) {
-        let elementInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(elementId);
-        let relationName = `${this.RELATION_BEGIN}${elementInfo.type.get()}`;
-        return spinal_env_viewer_graph_service_1.SpinalGraphService.removeChild(groupId, elementId, relationName, spinal_env_viewer_graph_service_1.SPINAL_RELATION_LST_PTR_TYPE).then((result) => {
+        return __awaiter(this, void 0, void 0, function* () {
+            let elementInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(elementId);
+            let relationName = `${this.RELATION_BEGIN}${elementInfo.type.get()}`;
+            let result;
+            try {
+                result = yield spinal_env_viewer_graph_service_1.SpinalGraphService.removeChild(groupId, elementId, relationName, spinal_env_viewer_graph_service_1.SPINAL_RELATION_PTR_LST_TYPE);
+            }
+            catch (error) {
+                result = yield spinal_env_viewer_graph_service_1.SpinalGraphService.removeChild(groupId, elementId, relationName, spinal_env_viewer_graph_service_1.SPINAL_RELATION_LST_PTR_TYPE);
+            }
             if (!result) {
                 const groupInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(groupId);
                 relationName = this._getGroupRelation(groupInfo.type.get());

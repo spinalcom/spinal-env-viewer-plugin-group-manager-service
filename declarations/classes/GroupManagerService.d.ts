@@ -12,19 +12,19 @@ export default class GroupManagerService {
         CONTEXT_TO_CATEGORY_RELATION: string;
         CATEGORY_TO_GROUP_RELATION: string;
         OLD_CONTEXTS_TYPES: Readonly<{
-            ROOMS_GROUP_CONTEXT: string;
-            EQUIPMENTS_GROUP_CONTEXT: string;
-            ENDPOINTS_GROUP_CONTEXT: string;
+            ROOMS_GROUP_CONTEXT: "RoomsGroupContext";
+            EQUIPMENTS_GROUP_CONTEXT: "EquipmentGroupContext";
+            ENDPOINTS_GROUP_CONTEXT: "EndpointGroupContext";
         }>;
         OLD_GROUPS_TYPES: Readonly<{
-            ROOMS_GROUP: string;
-            EQUIPMENTS_GROUP: string;
-            ENDPOINT_GROUP: string;
+            ROOMS_GROUP: "roomsGroup";
+            EQUIPMENTS_GROUP: "equipmentGroup";
+            ENDPOINT_GROUP: "endpointGroup";
         }>;
         OLD_RELATIONS_TYPES: Readonly<{
-            GROUP_TO_ROOMS_RELATION: string;
-            GROUP_TO_EQUIPMENTS_RELATION: string;
-            GROUP_TO_ENDPOINT_RELATION: string;
+            GROUP_TO_ROOMS_RELATION: "groupHasRooms";
+            GROUP_TO_EQUIPMENTS_RELATION: "groupHasEquipments";
+            GROUP_TO_ENDPOINT_RELATION: "groupHasEndpoints";
         }>;
         ELEMENT_LINKED_TO_GROUP_EVENT: string;
         ELEMENT_UNLINKED_TO_GROUP_EVENT: string;

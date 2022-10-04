@@ -80,7 +80,7 @@ export default class SpinalGroup {
             let childrenType = this._getChildrenType(contextInfo.type.get());
 
             if (childrenType === elementInfo.type.get() || this._isOldGroup(contextInfo.type.get(), elementInfo.type.get()))
-                return SpinalGraphService.addChildInContext(groupId, elementId, contextId, `${this.RELATION_BEGIN}${elementInfo.type.get()}`, SPINAL_RELATION_LST_PTR_TYPE)
+                return SpinalGraphService.addChildInContext(groupId, elementId, contextId, `${this.RELATION_BEGIN}${elementInfo.type.get()}`, SPINAL_RELATION_PTR_LST_TYPE)
 
         }
 
@@ -92,18 +92,24 @@ export default class SpinalGroup {
         return childrenIds.indexOf(elementId) !== -1;
     }
 
-    public unLinkElementToGroup(groupId: string, elementId: string): Promise<boolean> {
+    public async unLinkElementToGroup(groupId: string, elementId: string): Promise<boolean> {
         let elementInfo = SpinalGraphService.getInfo(elementId);
 
         let relationName = `${this.RELATION_BEGIN}${elementInfo.type.get()}`;
+        let result;
 
-        return SpinalGraphService.removeChild(groupId, elementId, relationName, SPINAL_RELATION_LST_PTR_TYPE).then((result) => {
-            if (!result) {
-                const groupInfo = SpinalGraphService.getInfo(groupId)
-                relationName = this._getGroupRelation(groupInfo.type.get());
-                return SpinalGraphService.removeChild(groupId, elementId, relationName, SPINAL_RELATION_PTR_LST_TYPE);
-            }
-        })
+        try {
+            result = await SpinalGraphService.removeChild(groupId, elementId, relationName, SPINAL_RELATION_PTR_LST_TYPE)
+        } catch (error) {
+            result = await SpinalGraphService.removeChild(groupId, elementId, relationName, SPINAL_RELATION_LST_PTR_TYPE)
+        }
+
+        if (!result) {
+            const groupInfo = SpinalGraphService.getInfo(groupId)
+            relationName = this._getGroupRelation(groupInfo.type.get());
+            return SpinalGraphService.removeChild(groupId, elementId, relationName, SPINAL_RELATION_PTR_LST_TYPE);
+        }
+
     }
 
 
