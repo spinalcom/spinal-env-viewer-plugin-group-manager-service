@@ -63,6 +63,8 @@ class GroupManagerService {
     }
     getGroupContexts(childType, graph) {
         graph = graph || spinal_env_viewer_graph_service_1.SpinalGraphService.getGraph();
+        //@ts-ignore
+        spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(graph);
         let graphId = graph.getId().get();
         return spinal_env_viewer_graph_service_1.SpinalGraphService.getChildren(graphId).then(contextsModel => {
             let contexts = contextsModel.map(el => el.get());
@@ -90,12 +92,15 @@ class GroupManagerService {
         return exports.spinalGroup.getGroups(nodeId);
     }
     linkElementToGroup(contextId, groupId, elementId) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const category = yield this.getGroupCategory(groupId);
             const group = yield this.elementIsInCategorie(category.id.get(), elementId);
-            const result = { old_group: undefined, newGroup: groupId };
+            const result = { old_group: (_a = group === null || group === void 0 ? void 0 : group.id) === null || _a === void 0 ? void 0 : _a.get(), newGroup: groupId };
+            if (result.old_group === result.newGroup)
+                return result;
             if (typeof group !== "undefined") {
-                this.unLinkElementToGroup(group.id.get(), elementId);
+                yield this.unLinkElementToGroup(group.id.get(), elementId);
                 result.old_group = group.id.get();
             }
             yield exports.spinalGroup.linkElementToGroup(contextId, groupId, elementId);

@@ -69,6 +69,9 @@ export default class GroupManagerService {
 
     public getGroupContexts(childType?: string, graph?: SpinalGraph<any>): Promise<INodeRefObj[]> {
         graph = graph || SpinalGraphService.getGraph()
+        //@ts-ignore
+        SpinalGraphService._addNode(graph);
+
         let graphId = graph.getId().get();
 
         return SpinalGraphService.getChildren(graphId).then(contextsModel => {
@@ -110,10 +113,12 @@ export default class GroupManagerService {
 
         const category = await this.getGroupCategory(groupId);
         const group = await this.elementIsInCategorie(category.id.get(), elementId);
-        const result = { old_group: undefined, newGroup: groupId };
+        const result = { old_group: group?.id?.get(), newGroup: groupId };
+
+        if (result.old_group === result.newGroup) return result;
 
         if (typeof group !== "undefined") {
-            this.unLinkElementToGroup(group.id.get(), elementId);
+            await this.unLinkElementToGroup(group.id.get(), elementId);
             result.old_group = group.id.get();
         }
 
