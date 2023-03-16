@@ -42,7 +42,7 @@ class SpinalGroup {
         this.CATEGORY_TO_GROUP_RELATION = constants_1.CATEGORY_TO_GROUP_RELATION;
         this.RELATION_BEGIN = constants_1.GROUP_RELATION_BEGIN;
     }
-    addGroup(contextId, categoryId, groupName, groupColor) {
+    addGroup(contextId, categoryId, groupName, groupColor, groupIcon = "3d_rotation") {
         return __awaiter(this, void 0, void 0, function* () {
             const groupFound = yield this._groupNameExist(categoryId, groupName);
             if (groupFound) {
@@ -53,7 +53,8 @@ class SpinalGroup {
                 let info = {
                     name: groupName,
                     type: `${this._getChildrenType(contextInfo.type.get())}Group`,
-                    color: groupColor ? groupColor : "#000000"
+                    color: groupColor ? groupColor : "#000000",
+                    icon: groupIcon
                 };
                 let childId = spinal_env_viewer_graph_service_1.SpinalGraphService.createNode(info, new spinal_core_connectorjs_type_1.Model({
                     name: groupName

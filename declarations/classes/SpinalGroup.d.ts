@@ -4,7 +4,7 @@ export default class SpinalGroup {
     CATEGORY_TO_GROUP_RELATION: string;
     RELATION_BEGIN: string;
     constructor();
-    addGroup(contextId: string, categoryId: string, groupName: string, groupColor: string): Promise<SpinalNode<any>>;
+    addGroup(contextId: string, categoryId: string, groupName: string, groupColor: string, groupIcon?: string): Promise<SpinalNode<any>>;
     linkElementToGroup(contextId: string, groupId: string, elementId: string): Promise<SpinalNode<any>>;
     elementIsLinkedToGroup(groupId: string, elementId: string): boolean;
     unLinkElementToGroup(groupId: string, elementId: string): Promise<boolean>;

@@ -35,7 +35,7 @@ export default class GroupManagerService {
     getGroupContexts(childType?: string, graph?: SpinalGraph<any>): Promise<INodeRefObj[]>;
     addCategory(contextId: string, categoryName: string, iconName: string): Promise<SpinalNode<any>>;
     getCategories(nodeId: string): Promise<SpinalNodeRef[]>;
-    addGroup(contextId: string, categoryId: string, groupName: string, groupColor: string): Promise<SpinalNode<any>>;
+    addGroup(contextId: string, categoryId: string, groupName: string, groupColor: string, groupIcon?: string): Promise<SpinalNode<any>>;
     getGroups(nodeId: string): Promise<SpinalNodeRef[]>;
     linkElementToGroup(contextId: string, groupId: string, elementId: string): Promise<{
         old_group: string;

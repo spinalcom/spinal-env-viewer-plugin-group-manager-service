@@ -85,8 +85,8 @@ class GroupManagerService {
     getCategories(nodeId) {
         return exports.spinalCategory.getCategories(nodeId);
     }
-    addGroup(contextId, categoryId, groupName, groupColor) {
-        return exports.spinalGroup.addGroup(contextId, categoryId, groupName, groupColor);
+    addGroup(contextId, categoryId, groupName, groupColor, groupIcon) {
+        return exports.spinalGroup.addGroup(contextId, categoryId, groupName, groupColor, groupIcon);
     }
     getGroups(nodeId) {
         return exports.spinalGroup.getGroups(nodeId);

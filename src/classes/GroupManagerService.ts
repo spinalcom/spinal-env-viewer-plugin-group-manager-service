@@ -101,8 +101,8 @@ export default class GroupManagerService {
         return spinalCategory.getCategories(nodeId);
     }
 
-    public addGroup(contextId: string, categoryId: string, groupName: string, groupColor: string): Promise<SpinalNode<any>> {
-        return spinalGroup.addGroup(contextId, categoryId, groupName, groupColor);
+    public addGroup(contextId: string, categoryId: string, groupName: string, groupColor: string, groupIcon?: string): Promise<SpinalNode<any>> {
+        return spinalGroup.addGroup(contextId, categoryId, groupName, groupColor, groupIcon);
     }
 
     public getGroups(nodeId: string): Promise<SpinalNodeRef[]> {

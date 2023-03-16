@@ -41,7 +41,7 @@ export default class SpinalGroup {
     constructor() { }
 
 
-    public async addGroup(contextId: string, categoryId: string, groupName: string, groupColor: string): Promise<SpinalNode<any>> {
+    public async addGroup(contextId: string, categoryId: string, groupName: string, groupColor: string, groupIcon: string = "3d_rotation"): Promise<SpinalNode<any>> {
 
 
         const groupFound = await this._groupNameExist(categoryId, groupName);
@@ -56,7 +56,8 @@ export default class SpinalGroup {
             let info = {
                 name: groupName,
                 type: `${this._getChildrenType(contextInfo.type.get())}Group`,
-                color: groupColor ? groupColor : "#000000"
+                color: groupColor ? groupColor : "#000000",
+                icon: groupIcon
             }
 
             let childId = SpinalGraphService.createNode(info, new Model({
