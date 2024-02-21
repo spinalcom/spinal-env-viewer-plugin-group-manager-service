@@ -54,10 +54,10 @@ class SpinalGroup {
                     name: groupName,
                     type: `${this._getChildrenType(contextInfo.type.get())}Group`,
                     color: groupColor ? groupColor : "#000000",
-                    icon: groupIcon
+                    icon: groupIcon,
                 };
                 let childId = spinal_env_viewer_graph_service_1.SpinalGraphService.createNode(info, new spinal_core_connectorjs_type_1.Model({
-                    name: groupName
+                    name: groupName,
                 }));
                 return spinal_env_viewer_graph_service_1.SpinalGraphService.addChildInContext(categoryId, childId, contextId, this.CATEGORY_TO_GROUP_RELATION, spinal_env_viewer_graph_service_1.SPINAL_RELATION_PTR_LST_TYPE);
             }
@@ -115,16 +115,16 @@ class SpinalGroup {
         let relations = [
             constants_1.CONTEXT_TO_CATEGORY_RELATION,
             constants_1.CATEGORY_TO_GROUP_RELATION,
-            `${this.RELATION_BEGIN}${nodeInfo.type.get()}`,
-            constants_1.OLD_RELATIONS_TYPES.GROUP_TO_ENDPOINT_RELATION,
-            constants_1.OLD_RELATIONS_TYPES.GROUP_TO_EQUIPMENTS_RELATION,
-            constants_1.OLD_RELATIONS_TYPES.GROUP_TO_ROOMS_RELATION
+            // `${this.RELATION_BEGIN}${nodeInfo.type.get()}`,
+            // OLD_RELATIONS_TYPES.GROUP_TO_ENDPOINT_RELATION,
+            // OLD_RELATIONS_TYPES.GROUP_TO_EQUIPMENTS_RELATION,
+            // OLD_RELATIONS_TYPES.GROUP_TO_ROOMS_RELATION,
         ];
         return spinal_env_viewer_graph_service_1.SpinalGraphService.findNodes(nodeId, relations, (node) => {
             let argType = node.getType().get();
             return this._isGroup(argType);
-        }).then(res => {
-            return res.map(el => {
+        }).then((res) => {
+            return res.map((el) => {
                 spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(el);
                 return spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(el.getId().get());
             });
@@ -148,7 +148,7 @@ class SpinalGroup {
                     }
                     else {
                         realNode.info.add_attr({
-                            [key]: value
+                            [key]: value,
                         });
                     }
                 }
