@@ -79,13 +79,19 @@ class SpinalCategory {
         }
     }
     elementIsInCategorie(categoryId, elementId) {
-        return spinal_env_viewer_graph_service_1.SpinalGraphService.getChildren(categoryId, [constants_1.CATEGORY_TO_GROUP_RELATION]).then(children => {
+        const realNode = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(categoryId);
+        return realNode.getChildren([constants_1.CATEGORY_TO_GROUP_RELATION]).then(children => {
             let itemFound = children.find((child) => {
-                return child.childrenIds.find(el => {
+                const childrenIds = child.getChildrenIds();
+                return childrenIds.find(el => {
                     return el === elementId;
                 });
             });
-            return itemFound;
+            if (itemFound) {
+                spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(itemFound);
+                return spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(itemFound.getId().get());
+            }
+            return undefined;
         });
     }
     updateCategory(categoryId, newInfo) {

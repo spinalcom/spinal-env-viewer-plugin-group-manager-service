@@ -94,14 +94,19 @@ export default class SpinalCategory {
     }
 
     public elementIsInCategorie(categoryId: string, elementId: string): Promise<SpinalNodeRef> {
-        return SpinalGraphService.getChildren(categoryId, [CATEGORY_TO_GROUP_RELATION]).then(children => {
+        const realNode = SpinalGraphService.getRealNode(categoryId);
+        return realNode.getChildren([CATEGORY_TO_GROUP_RELATION]).then(children => {
             let itemFound = children.find((child: any) => {
-                return child.childrenIds.find(el => {
+                const childrenIds = child.getChildrenIds();
+                return childrenIds.find(el => {
                     return el === elementId
                 })
             })
-
-            return itemFound;
+            if (itemFound) {
+                SpinalGraphService._addNode(itemFound);
+                return SpinalGraphService.getInfo(itemFound.getId().get());
+            }
+            return undefined;
         })
     }
 
