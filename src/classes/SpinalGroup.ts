@@ -44,6 +44,7 @@ import { Model } from 'spinal-core-connectorjs_type';
 import geographicService from 'spinal-env-viewer-context-geographic-service';
 import { SpinalBmsEndpoint } from 'spinal-model-bmsnetwork';
 import { IGroupInfo } from '../interfaces/IGroupInfo';
+import { spinalControlPointService } from 'spinal-env-viewer-plugin-control-endpoint-service';
 
 export default class SpinalGroup {
   public CATEGORY_TO_GROUP_RELATION: string = CATEGORY_TO_GROUP_RELATION;
@@ -241,6 +242,25 @@ export default class SpinalGroup {
     }
 
     return SpinalGraphService.getInfo(realNode.getId().get());
+  }
+
+  public async deleteGroupFromGraph(groupId: string): Promise<void> {
+    const controlPoints = await spinalControlPointService.loadElementLinked(
+      groupId
+    );
+    const unlinkPromises: Promise<any>[] = [];
+    for (const controlPoint of controlPoints) {
+      SpinalGraphService._addNode(controlPoint);
+      unlinkPromises.push(
+        spinalControlPointService.unLinkControlPointToGroup(
+          groupId,
+          controlPoint.info.id.get()
+        )
+      );
+    }
+    await Promise.all(unlinkPromises);
+    const group = SpinalGraphService.getRealNode(groupId);
+    await group.removeFromGraph();
   }
 
   public _isGroup(type: string): boolean {

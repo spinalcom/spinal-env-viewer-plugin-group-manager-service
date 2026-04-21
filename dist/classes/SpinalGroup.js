@@ -37,6 +37,7 @@ const constants_1 = require("./constants");
 const spinal_core_connectorjs_type_1 = require("spinal-core-connectorjs_type");
 const spinal_env_viewer_context_geographic_service_1 = require("spinal-env-viewer-context-geographic-service");
 const spinal_model_bmsnetwork_1 = require("spinal-model-bmsnetwork");
+const spinal_env_viewer_plugin_control_endpoint_service_1 = require("spinal-env-viewer-plugin-control-endpoint-service");
 class SpinalGroup {
     constructor() {
         this.CATEGORY_TO_GROUP_RELATION = constants_1.CATEGORY_TO_GROUP_RELATION;
@@ -94,7 +95,7 @@ class SpinalGroup {
             }
             if (!result) {
                 const groupInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(groupId);
-                relationName = this._getGroupRelation(groupInfo.type.get());
+                const relationName = this._getGroupRelation(groupInfo.type.get());
                 if (relationName) {
                     return spinal_env_viewer_graph_service_1.SpinalGraphService.removeChild(groupId, elementId, relationName, spinal_env_viewer_graph_service_1.SPINAL_RELATION_PTR_LST_TYPE);
                 }
@@ -159,6 +160,19 @@ class SpinalGroup {
                 }
             }
             return spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(realNode.getId().get());
+        });
+    }
+    deleteGroupFromGraph(groupId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const controlPoints = yield spinal_env_viewer_plugin_control_endpoint_service_1.spinalControlPointService.loadElementLinked(groupId);
+            const unlinkPromises = [];
+            for (const controlPoint of controlPoints) {
+                spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(controlPoint);
+                unlinkPromises.push(spinal_env_viewer_plugin_control_endpoint_service_1.spinalControlPointService.unLinkControlPointToGroup(groupId, controlPoint.info.id.get()));
+            }
+            yield Promise.all(unlinkPromises);
+            const group = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(groupId);
+            yield group.removeFromGraph();
         });
     }
     _isGroup(type) {

@@ -1,5 +1,6 @@
 import { SpinalNode, SpinalNodeRef } from 'spinal-env-viewer-graph-service';
 import { ICategoryInfo } from '../interfaces/ICategoryInfo';
+import type SpinalGroup from './SpinalGroup';
 export default class SpinalCategory {
     CATEGORY_TYPE: string;
     CONTEXT_TO_CATEGORY_RELATION: string;
@@ -8,6 +9,7 @@ export default class SpinalCategory {
     getCategories(nodeId: string): Promise<SpinalNodeRef[]>;
     elementIsInCategorie(categoryId: string, elementId: string): Promise<SpinalNodeRef | undefined>;
     updateCategory(categoryId: string, newInfo: ICategoryInfo): Promise<SpinalNode<any>>;
+    deleteCategoryFromGraph(categoryId: string, spinalGroup: SpinalGroup): Promise<void>;
     _isCategory(type: string): boolean;
     _isContext(type: string): boolean;
     private _getRelationRefs;

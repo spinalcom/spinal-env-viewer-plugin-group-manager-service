@@ -12,6 +12,7 @@ export default class SpinalGroup {
     getGroups(nodeId: string): Promise<SpinalNodeRef[]>;
     getCategory(groupId: string): Promise<SpinalNodeRef | undefined>;
     updateGroup(groupId: string, newInfo: IGroupInfo): Promise<SpinalNodeRef>;
+    deleteGroupFromGraph(groupId: string): Promise<void>;
     _isGroup(type: string): boolean;
     checkGroupType(groupType: string, childrenType: string): boolean;
     private _getChildrenType;

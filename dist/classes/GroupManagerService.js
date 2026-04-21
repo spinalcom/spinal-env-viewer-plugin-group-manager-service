@@ -185,6 +185,21 @@ class GroupManagerService {
             return type.replace(constants_1.GROUP_TYPE_END, '');
         return undefined;
     }
+    deleteGroupFromGraph(groupId) {
+        return exports.spinalGroup.deleteGroupFromGraph(groupId);
+    }
+    deleteCategoryFromGraph(categoryId) {
+        return exports.spinalCategory.deleteCategoryFromGraph(categoryId, exports.spinalGroup);
+    }
+    deleteContextFromGraph(contextId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const categories = yield exports.spinalCategory.getCategories(contextId);
+            for (const category of categories) {
+                yield this.deleteCategoryFromGraph(category.id.get());
+            }
+            yield spinal_env_viewer_graph_service_1.SpinalGraphService.removeFromGraph(contextId);
+        });
+    }
     ////////////////////////////////////////////////////////////////////
     //                      PRIVATES                                  //
     ////////////////////////////////////////////////////////////////////

@@ -116,6 +116,15 @@ class SpinalCategory {
             return realNode;
         });
     }
+    deleteCategoryFromGraph(categoryId, spinalGroup) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const groups = yield spinalGroup.getGroups(categoryId);
+            for (const group of groups) {
+                yield spinalGroup.deleteGroupFromGraph(group.id.get());
+            }
+            yield spinal_env_viewer_graph_service_1.SpinalGraphService.removeFromGraph(categoryId);
+        });
+    }
     ////////////////////////////////////////////////////////////////////
     //                      PRIVATES                                  //
     ////////////////////////////////////////////////////////////////////

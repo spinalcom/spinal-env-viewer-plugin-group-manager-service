@@ -281,6 +281,20 @@ export default class GroupManagerService {
     return undefined;
   }
 
+  public deleteGroupFromGraph(groupId: string): Promise<void> {
+    return spinalGroup.deleteGroupFromGraph(groupId);
+  }
+  public deleteCategoryFromGraph(categoryId: string): Promise<void> {
+    return spinalCategory.deleteCategoryFromGraph(categoryId, spinalGroup);
+  }
+  public async deleteContextFromGraph(contextId: string): Promise<void> {
+    const categories = await spinalCategory.getCategories(contextId);
+    for (const category of categories) {
+      await this.deleteCategoryFromGraph(category.id.get());
+    }
+    await SpinalGraphService.removeFromGraph(contextId);
+  }
+
   ////////////////////////////////////////////////////////////////////
   //                      PRIVATES                                  //
   ////////////////////////////////////////////////////////////////////

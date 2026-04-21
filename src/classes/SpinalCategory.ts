@@ -39,6 +39,7 @@ import {
 import { Model } from 'spinal-core-connectorjs_type';
 import { ICategoryInfo } from '../interfaces/ICategoryInfo';
 import { AnySpinalRelation } from 'spinal-model-graph';
+import type SpinalGroup from './SpinalGroup';
 
 export default class SpinalCategory {
   CATEGORY_TYPE: string = CATEGORY_TYPE;
@@ -142,6 +143,17 @@ export default class SpinalCategory {
     }
 
     return realNode;
+  }
+
+  public async deleteCategoryFromGraph(
+    categoryId: string,
+    spinalGroup: SpinalGroup
+  ): Promise<void> {
+    const groups = await spinalGroup.getGroups(categoryId);
+    for (const group of groups) {
+      await spinalGroup.deleteGroupFromGraph(group.id.get());
+    }
+    await SpinalGraphService.removeFromGraph(categoryId);
   }
 
   ////////////////////////////////////////////////////////////////////

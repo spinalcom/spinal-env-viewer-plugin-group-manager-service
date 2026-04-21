@@ -58,6 +58,9 @@ export default class GroupManagerService {
     updateCategory(categoryId: string, newInfo: ICategoryInfo): Promise<SpinalNode<any>>;
     updateGroup(categoryId: string, newInfo: IGroupInfo): Promise<SpinalNodeRef>;
     getChildrenType(type: string): string | undefined;
+    deleteGroupFromGraph(groupId: string): Promise<void>;
+    deleteCategoryFromGraph(categoryId: string): Promise<void>;
+    deleteContextFromGraph(contextId: string): Promise<void>;
     private _getOldTypes;
     private _getContexts;
 }
