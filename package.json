@@ -1,11 +1,11 @@
 {
 	"name": "spinal-env-viewer-plugin-group-manager-service",
-	"version": "1.3.4",
+	"version": "1.3.5",
 	"description": "",
 	"main": "dist/index.js",
 	"types": "declarations",
 	"scripts": {
-		"build": "rm -fr dist && tsc",
+		"build": "rm -fr dist declarations && tsc",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"keywords": [],
@@ -16,7 +16,8 @@
 		"spinal-env-viewer-graph-service": "git+https://github.com/spinalcom/Spinal-Graph-Service.git",
 		"spinal-model-bmsnetwork": "git+https://github.com/spinalcom/spinal-model-bmsnetwork.git",
 		"spinal-env-viewer-context-geographic-service": "git+https://github.com/spinalcom/spinal-env-viewer-context-geographic-service.git",
-		"spinal-env-viewer-plugin-event-emitter": "git+https://github.com/spinalcom/spinal-env-viewer-plugin-event-emitter.git"
+		"spinal-env-viewer-plugin-event-emitter": "git+https://github.com/spinalcom/spinal-env-viewer-plugin-event-emitter.git",
+		"spinal-env-viewer-plugin-control-endpoint-service": "git+https://github.com/spinalcom/spinal-env-viewer-plugin-control-endpoint-service.git"
 	},
 	"devDependencies": {
 		"@types/node": "^18.8.2",

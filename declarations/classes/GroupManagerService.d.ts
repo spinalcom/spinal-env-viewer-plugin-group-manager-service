@@ -1,9 +1,9 @@
-import { SpinalGraph, SpinalContext, SpinalNode, SpinalNodeRef } from "spinal-env-viewer-graph-service";
-import SpinalGroup from "./SpinalGroup";
-import SpinalCategory from "./SpinalCategory";
-import { INodeRefObj } from "../interfaces/INodeRefObj";
-import { IGroupInfo } from "../interfaces/IGroupInfo";
-import { ICategoryInfo } from "../interfaces/ICategoryInfo";
+import { SpinalGraph, SpinalContext, SpinalNode, SpinalNodeRef } from 'spinal-env-viewer-graph-service';
+import SpinalGroup from './SpinalGroup';
+import SpinalCategory from './SpinalCategory';
+import { INodeRefObj } from '../interfaces/INodeRefObj';
+import { IGroupInfo } from '../interfaces/IGroupInfo';
+import { ICategoryInfo } from '../interfaces/ICategoryInfo';
 export declare const spinalGroup: SpinalGroup;
 export declare const spinalCategory: SpinalCategory;
 export default class GroupManagerService {
@@ -35,17 +35,17 @@ export default class GroupManagerService {
     getGroupContexts(childType?: string, graph?: SpinalGraph<any>): Promise<INodeRefObj[]>;
     addCategory(contextId: string, categoryName: string, iconName: string): Promise<SpinalNode<any>>;
     getCategories(nodeId: string): Promise<SpinalNodeRef[]>;
-    addGroup(contextId: string, categoryId: string, groupName: string, groupColor: string, groupIcon?: string): Promise<SpinalNode<any>>;
+    addGroup(contextId: string, categoryId: string, groupName: string, groupColor: string, groupIcon?: string): Promise<SpinalNode<any> | undefined>;
     getGroups(nodeId: string): Promise<SpinalNodeRef[]>;
     linkElementToGroup(contextId: string, groupId: string, elementId: string): Promise<{
         old_group: string;
         newGroup: string;
     }>;
     elementIsLinkedToGroup(groupId: string, elementId: string): boolean;
-    elementIsInCategorie(categoryId: string, elementId: string): Promise<SpinalNodeRef>;
-    unLinkElementToGroup(groupId: string, elementId: string): Promise<boolean>;
+    elementIsInCategorie(categoryId: string, elementId: string): Promise<SpinalNodeRef | undefined>;
+    unLinkElementToGroup(groupId: string, elementId: string): Promise<boolean | void>;
     getElementsLinkedToGroup(groupId: string): Promise<SpinalNodeRef[]>;
-    getGroupCategory(groupId: string): Promise<SpinalNodeRef>;
+    getGroupCategory(groupId: string): Promise<SpinalNodeRef | undefined>;
     isContext(type: string): boolean;
     isRoomGroupContext(type: string): boolean;
     isEquipmentGroupContext(type: string): boolean;
@@ -57,7 +57,10 @@ export default class GroupManagerService {
     checkContextType(contextType: string, childrenType: string): boolean;
     updateCategory(categoryId: string, newInfo: ICategoryInfo): Promise<SpinalNode<any>>;
     updateGroup(categoryId: string, newInfo: IGroupInfo): Promise<SpinalNodeRef>;
-    getChildrenType(type: string): string;
+    getChildrenType(type: string): string | undefined;
+    deleteGroupFromGraph(groupId: string): Promise<void>;
+    deleteCategoryFromGraph(categoryId: string): Promise<void>;
+    deleteContextFromGraph(contextId: string): Promise<void>;
     private _getOldTypes;
     private _getContexts;
 }

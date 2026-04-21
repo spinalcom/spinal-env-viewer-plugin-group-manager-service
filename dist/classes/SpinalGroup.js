@@ -37,13 +37,14 @@ const constants_1 = require("./constants");
 const spinal_core_connectorjs_type_1 = require("spinal-core-connectorjs_type");
 const spinal_env_viewer_context_geographic_service_1 = require("spinal-env-viewer-context-geographic-service");
 const spinal_model_bmsnetwork_1 = require("spinal-model-bmsnetwork");
+const spinal_env_viewer_plugin_control_endpoint_service_1 = require("spinal-env-viewer-plugin-control-endpoint-service");
 class SpinalGroup {
     constructor() {
         this.CATEGORY_TO_GROUP_RELATION = constants_1.CATEGORY_TO_GROUP_RELATION;
         this.RELATION_BEGIN = constants_1.GROUP_RELATION_BEGIN;
     }
-    addGroup(contextId, categoryId, groupName, groupColor, groupIcon = "3d_rotation") {
-        return __awaiter(this, void 0, void 0, function* () {
+    addGroup(contextId_1, categoryId_1, groupName_1, groupColor_1) {
+        return __awaiter(this, arguments, void 0, function* (contextId, categoryId, groupName, groupColor, groupIcon = '3d_rotation') {
             const groupFound = yield this._groupNameExist(categoryId, groupName);
             if (groupFound) {
                 return spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(groupFound.id.get());
@@ -53,7 +54,7 @@ class SpinalGroup {
                 let info = {
                     name: groupName,
                     type: `${this._getChildrenType(contextInfo.type.get())}Group`,
-                    color: groupColor ? groupColor : "#000000",
+                    color: groupColor ? groupColor : '#000000',
                     icon: groupIcon,
                 };
                 let childId = spinal_env_viewer_graph_service_1.SpinalGraphService.createNode(info, new spinal_core_connectorjs_type_1.Model({
@@ -70,7 +71,8 @@ class SpinalGroup {
             let elementInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(elementId);
             if (contextInfo && elementInfo) {
                 let childrenType = this._getChildrenType(contextInfo.type.get());
-                if (childrenType === elementInfo.type.get() || this._isOldGroup(contextInfo.type.get(), elementInfo.type.get()))
+                if (childrenType === elementInfo.type.get() ||
+                    this._isOldGroup(contextInfo.type.get(), elementInfo.type.get()))
                     return spinal_env_viewer_graph_service_1.SpinalGraphService.addChildInContext(groupId, elementId, contextId, `${this.RELATION_BEGIN}${elementInfo.type.get()}`, spinal_env_viewer_graph_service_1.SPINAL_RELATION_PTR_LST_TYPE);
             }
             throw Error(`${elementInfo.type.get()} cannot be linked to this group.`);
@@ -93,8 +95,10 @@ class SpinalGroup {
             }
             if (!result) {
                 const groupInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(groupId);
-                relationName = this._getGroupRelation(groupInfo.type.get());
-                return spinal_env_viewer_graph_service_1.SpinalGraphService.removeChild(groupId, elementId, relationName, spinal_env_viewer_graph_service_1.SPINAL_RELATION_PTR_LST_TYPE);
+                const relationName = this._getGroupRelation(groupInfo.type.get());
+                if (relationName) {
+                    return spinal_env_viewer_graph_service_1.SpinalGraphService.removeChild(groupId, elementId, relationName, spinal_env_viewer_graph_service_1.SPINAL_RELATION_PTR_LST_TYPE);
+                }
             }
         });
     }
@@ -103,27 +107,28 @@ class SpinalGroup {
         let type = this._getChildrenType(groupInfo.type.get());
         let relationNames = [`${this.RELATION_BEGIN}${type}`];
         const tempRel = this._getGroupRelation(groupInfo.type.get());
-        if (typeof tempRel !== "undefined")
+        if (typeof tempRel !== 'undefined')
             relationNames.push(tempRel);
         return spinal_env_viewer_graph_service_1.SpinalGraphService.getChildren(groupId, relationNames);
     }
     getGroups(nodeId) {
-        let nodeInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(nodeId);
-        if (this._isGroup(nodeInfo.type.get())) {
-            return Promise.resolve([nodeInfo]);
-        }
-        let relations = [
-            constants_1.CONTEXT_TO_CATEGORY_RELATION,
-            constants_1.CATEGORY_TO_GROUP_RELATION,
-            // `${this.RELATION_BEGIN}${nodeInfo.type.get()}`,
-            // OLD_RELATIONS_TYPES.GROUP_TO_ENDPOINT_RELATION,
-            // OLD_RELATIONS_TYPES.GROUP_TO_EQUIPMENTS_RELATION,
-            // OLD_RELATIONS_TYPES.GROUP_TO_ROOMS_RELATION,
-        ];
-        return spinal_env_viewer_graph_service_1.SpinalGraphService.findNodes(nodeId, relations, (node) => {
-            let argType = node.getType().get();
-            return this._isGroup(argType);
-        }).then((res) => {
+        return __awaiter(this, void 0, void 0, function* () {
+            let nodeInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(nodeId);
+            if (this._isGroup(nodeInfo.type.get())) {
+                return Promise.resolve([nodeInfo]);
+            }
+            let relations = [
+                constants_1.CONTEXT_TO_CATEGORY_RELATION,
+                constants_1.CATEGORY_TO_GROUP_RELATION,
+                // `${this.RELATION_BEGIN}${nodeInfo.type.get()}`,
+                // OLD_RELATIONS_TYPES.GROUP_TO_ENDPOINT_RELATION,
+                // OLD_RELATIONS_TYPES.GROUP_TO_EQUIPMENTS_RELATION,
+                // OLD_RELATIONS_TYPES.GROUP_TO_ROOMS_RELATION,
+            ];
+            const res = yield spinal_env_viewer_graph_service_1.SpinalGraphService.findNodes(nodeId, relations, (node) => {
+                let argType = node.getType().get();
+                return this._isGroup(argType);
+            });
             return res.map((el) => {
                 spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(el);
                 return spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(el.getId().get());
@@ -135,6 +140,7 @@ class SpinalGroup {
             const parents = yield spinal_env_viewer_graph_service_1.SpinalGraphService.getParents(groupId, this.CATEGORY_TO_GROUP_RELATION);
             if (parents.length > 0)
                 return parents[0];
+            return undefined;
         });
     }
     updateGroup(groupId, newInfo) {
@@ -156,6 +162,19 @@ class SpinalGroup {
             return spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(realNode.getId().get());
         });
     }
+    deleteGroupFromGraph(groupId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const controlPoints = yield spinal_env_viewer_plugin_control_endpoint_service_1.spinalControlPointService.loadElementLinked(groupId);
+            const unlinkPromises = [];
+            for (const controlPoint of controlPoints) {
+                spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(controlPoint);
+                unlinkPromises.push(spinal_env_viewer_plugin_control_endpoint_service_1.spinalControlPointService.unLinkControlPointToGroup(groupId, controlPoint.info.id.get()));
+            }
+            yield Promise.all(unlinkPromises);
+            const group = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(groupId);
+            yield group.removeFromGraph();
+        });
+    }
     _isGroup(type) {
         // let stringEnd = type.substr(type.length - 5);
         // return stringEnd === "Group";
@@ -168,27 +187,38 @@ class SpinalGroup {
     //                      PRIVATES                                  //
     ////////////////////////////////////////////////////////////////////
     _getChildrenType(elementType) {
-        if (elementType.toLowerCase() === constants_1.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT.toLowerCase() || elementType.toLowerCase() === constants_1.OLD_GROUPS_TYPES.ROOMS_GROUP.toLowerCase()) {
+        if (elementType.toLowerCase() ===
+            constants_1.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT.toLowerCase() ||
+            elementType.toLowerCase() === constants_1.OLD_GROUPS_TYPES.ROOMS_GROUP.toLowerCase()) {
             return spinal_env_viewer_context_geographic_service_1.default.constants.ROOM_TYPE;
         }
-        else if (elementType.toLowerCase() === constants_1.OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT.toLowerCase() || elementType.toLowerCase() === constants_1.OLD_GROUPS_TYPES.EQUIPMENTS_GROUP.toLowerCase()) {
+        else if (elementType.toLowerCase() ===
+            constants_1.OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT.toLowerCase() ||
+            elementType.toLowerCase() ===
+                constants_1.OLD_GROUPS_TYPES.EQUIPMENTS_GROUP.toLowerCase()) {
             return spinal_env_viewer_context_geographic_service_1.default.constants.EQUIPMENT_TYPE;
         }
-        else if (elementType.toLowerCase() === constants_1.OLD_CONTEXTS_TYPES.ENDPOINTS_GROUP_CONTEXT.toLowerCase() || elementType.toLowerCase() === constants_1.OLD_GROUPS_TYPES.ENDPOINT_GROUP.toLowerCase()) {
+        else if (elementType.toLowerCase() ===
+            constants_1.OLD_CONTEXTS_TYPES.ENDPOINTS_GROUP_CONTEXT.toLowerCase() ||
+            elementType.toLowerCase() ===
+                constants_1.OLD_GROUPS_TYPES.ENDPOINT_GROUP.toLowerCase()) {
             return spinal_model_bmsnetwork_1.SpinalBmsEndpoint.nodeTypeName;
         }
         else {
             if (/GroupContext$/.test(elementType))
-                return elementType.replace("GroupContext", "");
+                return elementType.replace('GroupContext', '');
             else if (/Group$/.test(elementType))
-                return elementType.replace("Group", "");
+                return elementType.replace('Group', '');
             throw new Error(`${elementType} is not a group element type`);
         }
     }
     _isOldGroup(contextType, elementType) {
-        const isRoomGroup = contextType === constants_1.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT && elementType === spinal_env_viewer_context_geographic_service_1.default.constants.ROOM_TYPE;
-        const isEquipementGroup = contextType === constants_1.OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT && elementType === spinal_env_viewer_context_geographic_service_1.default.constants.EQUIPMENT_TYPE;
-        const isEndpointGroup = contextType === constants_1.OLD_CONTEXTS_TYPES.ENDPOINTS_GROUP_CONTEXT && elementType === spinal_model_bmsnetwork_1.SpinalBmsEndpoint.nodeTypeName;
+        const isRoomGroup = contextType === constants_1.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT &&
+            elementType === spinal_env_viewer_context_geographic_service_1.default.constants.ROOM_TYPE;
+        const isEquipementGroup = contextType === constants_1.OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT &&
+            elementType === spinal_env_viewer_context_geographic_service_1.default.constants.EQUIPMENT_TYPE;
+        const isEndpointGroup = contextType === constants_1.OLD_CONTEXTS_TYPES.ENDPOINTS_GROUP_CONTEXT &&
+            elementType === spinal_model_bmsnetwork_1.SpinalBmsEndpoint.nodeTypeName;
         console.log(isRoomGroup, isEquipementGroup, isEndpointGroup);
         return isRoomGroup || isEquipementGroup || isEndpointGroup;
     }
@@ -200,22 +230,19 @@ class SpinalGroup {
                 if (name === groupName)
                     return group;
             }
+            return undefined;
         });
     }
     _getGroupRelation(type) {
-        let relationName;
         switch (type.toLowerCase()) {
             case constants_1.OLD_GROUPS_TYPES.ROOMS_GROUP.toLowerCase():
-                relationName = constants_1.OLD_RELATIONS_TYPES.GROUP_TO_ROOMS_RELATION;
-                break;
+                return constants_1.OLD_RELATIONS_TYPES.GROUP_TO_ROOMS_RELATION;
             case constants_1.OLD_GROUPS_TYPES.EQUIPMENTS_GROUP.toLowerCase():
-                relationName = constants_1.OLD_RELATIONS_TYPES.GROUP_TO_EQUIPMENTS_RELATION;
-                break;
-            case constants_1.OLD_GROUPS_TYPES.EQUIPMENTS_GROUP.toLowerCase():
-                relationName = constants_1.OLD_RELATIONS_TYPES.GROUP_TO_ENDPOINT_RELATION;
-                break;
+                return constants_1.OLD_RELATIONS_TYPES.GROUP_TO_EQUIPMENTS_RELATION;
+            case constants_1.OLD_GROUPS_TYPES.ENDPOINT_GROUP.toLowerCase():
+                return constants_1.OLD_RELATIONS_TYPES.GROUP_TO_ENDPOINT_RELATION;
         }
-        return relationName;
+        return undefined;
     }
 }
 exports.default = SpinalGroup;
