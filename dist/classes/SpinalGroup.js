@@ -256,11 +256,17 @@ class SpinalGroup {
     }
     unLinkControlPointToGroup(groupId, controlPointId) {
         return __awaiter(this, void 0, void 0, function* () {
+            const controlPoint = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(controlPointId);
+            if (!controlPoint)
+                return;
             const groupChildren = yield this.getElementsLinkedToGroup(groupId);
             for (const grpChild of groupChildren) {
-                const controlPoints = yield grpChild.getChildren('hasControlPoint');
-                if (controlPoints.find((cp) => { var _a; return ((_a = cp.info.referenceId) === null || _a === void 0 ? void 0 : _a.get()) === controlPointId; })) {
-                    yield spinal_env_viewer_graph_service_1.SpinalGraphService.removeChild(grpChild.id.get(), controlPointId, 'hasControlPoint', spinal_env_viewer_graph_service_1.SPINAL_RELATION_LST_PTR_TYPE);
+                const grpChildNode = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(grpChild.id.get());
+                if (!grpChildNode)
+                    continue;
+                const controlPoints = yield grpChildNode.getChildren('hasControlPoint');
+                if (controlPoints.find((cp) => { var _a; return ((_a = cp.info.referenceId) === null || _a === void 0 ? void 0 : _a.get()) === controlPoint.info.id.get(); })) {
+                    yield grpChildNode.removeChild(controlPoint, 'hasControlPoint', spinal_env_viewer_graph_service_1.SPINAL_RELATION_LST_PTR_TYPE);
                 }
             }
         });

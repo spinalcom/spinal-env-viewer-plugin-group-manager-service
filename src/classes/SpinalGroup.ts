@@ -358,17 +358,21 @@ export default class SpinalGroup {
     groupId: string,
     controlPointId: string
   ) {
+    const controlPoint = SpinalGraphService.getRealNode(controlPointId);
+    if (!controlPoint) return;
     const groupChildren = await this.getElementsLinkedToGroup(groupId);
     for (const grpChild of groupChildren) {
-      const controlPoints = await grpChild.getChildren('hasControlPoint');
+      const grpChildNode = SpinalGraphService.getRealNode(grpChild.id.get());
+      if (!grpChildNode) continue;
+      const controlPoints = await grpChildNode.getChildren('hasControlPoint');
       if (
         controlPoints.find(
-          (cp: SpinalNode) => cp.info.referenceId?.get() === controlPointId
+          (cp: SpinalNode) =>
+            cp.info.referenceId?.get() === controlPoint.info.id.get()
         )
       ) {
-        await SpinalGraphService.removeChild(
-          grpChild.id.get(),
-          controlPointId,
+        await grpChildNode.removeChild(
+          controlPoint,
           'hasControlPoint',
           SPINAL_RELATION_LST_PTR_TYPE
         );
