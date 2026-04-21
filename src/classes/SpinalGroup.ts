@@ -44,7 +44,6 @@ import { Model } from 'spinal-core-connectorjs_type';
 import geographicService from 'spinal-env-viewer-context-geographic-service';
 import { SpinalBmsEndpoint } from 'spinal-model-bmsnetwork';
 import { IGroupInfo } from '../interfaces/IGroupInfo';
-import { spinalControlPointService } from 'spinal-env-viewer-plugin-control-endpoint-service';
 
 export default class SpinalGroup {
   public CATEGORY_TO_GROUP_RELATION: string = CATEGORY_TO_GROUP_RELATION;
@@ -245,17 +244,13 @@ export default class SpinalGroup {
   }
 
   public async deleteGroupFromGraph(groupId: string): Promise<void> {
-    const controlPoints = await spinalControlPointService.loadElementLinked(
-      groupId
-    );
+    const controlPoints = await this.loadControlPointLinked(groupId);
+    if (!controlPoints) return;
     const unlinkPromises: Promise<any>[] = [];
     for (const controlPoint of controlPoints) {
       SpinalGraphService._addNode(controlPoint);
       unlinkPromises.push(
-        spinalControlPointService.unLinkControlPointToGroup(
-          groupId,
-          controlPoint.info.id.get()
-        )
+        this.unLinkControlPointToGroup(groupId, controlPoint.info.id.get())
       );
     }
     await Promise.all(unlinkPromises);
@@ -349,5 +344,35 @@ export default class SpinalGroup {
         return OLD_RELATIONS_TYPES.GROUP_TO_ENDPOINT_RELATION;
     }
     return undefined;
+  }
+
+  private async loadControlPointLinked(
+    grpNodeId: string
+  ): Promise<spinal.Lst<SpinalNode<any>> | undefined> {
+    const realNode = SpinalGraphService.getRealNode(grpNodeId);
+    if (!realNode || !realNode.info || !realNode.info.linkedItems) return;
+    return realNode.info.linkedItems?.load();
+  }
+
+  private async unLinkControlPointToGroup(
+    groupId: string,
+    controlPointId: string
+  ) {
+    const groupChildren = await this.getElementsLinkedToGroup(groupId);
+    for (const grpChild of groupChildren) {
+      const controlPoints = await grpChild.getChildren('hasControlPoint');
+      if (
+        controlPoints.find(
+          (cp: SpinalNode) => cp.info.referenceId?.get() === controlPointId
+        )
+      ) {
+        await SpinalGraphService.removeChild(
+          grpChild.id.get(),
+          controlPointId,
+          'hasControlPoint',
+          SPINAL_RELATION_LST_PTR_TYPE
+        );
+      }
+    }
   }
 }

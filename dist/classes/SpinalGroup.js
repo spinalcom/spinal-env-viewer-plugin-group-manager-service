@@ -37,7 +37,6 @@ const constants_1 = require("./constants");
 const spinal_core_connectorjs_type_1 = require("spinal-core-connectorjs_type");
 const spinal_env_viewer_context_geographic_service_1 = require("spinal-env-viewer-context-geographic-service");
 const spinal_model_bmsnetwork_1 = require("spinal-model-bmsnetwork");
-const spinal_env_viewer_plugin_control_endpoint_service_1 = require("spinal-env-viewer-plugin-control-endpoint-service");
 class SpinalGroup {
     constructor() {
         this.CATEGORY_TO_GROUP_RELATION = constants_1.CATEGORY_TO_GROUP_RELATION;
@@ -164,11 +163,13 @@ class SpinalGroup {
     }
     deleteGroupFromGraph(groupId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const controlPoints = yield spinal_env_viewer_plugin_control_endpoint_service_1.spinalControlPointService.loadElementLinked(groupId);
+            const controlPoints = yield this.loadControlPointLinked(groupId);
+            if (!controlPoints)
+                return;
             const unlinkPromises = [];
             for (const controlPoint of controlPoints) {
                 spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(controlPoint);
-                unlinkPromises.push(spinal_env_viewer_plugin_control_endpoint_service_1.spinalControlPointService.unLinkControlPointToGroup(groupId, controlPoint.info.id.get()));
+                unlinkPromises.push(this.unLinkControlPointToGroup(groupId, controlPoint.info.id.get()));
             }
             yield Promise.all(unlinkPromises);
             const group = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(groupId);
@@ -243,6 +244,26 @@ class SpinalGroup {
                 return constants_1.OLD_RELATIONS_TYPES.GROUP_TO_ENDPOINT_RELATION;
         }
         return undefined;
+    }
+    loadControlPointLinked(grpNodeId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            const realNode = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(grpNodeId);
+            if (!realNode || !realNode.info || !realNode.info.linkedItems)
+                return;
+            return (_a = realNode.info.linkedItems) === null || _a === void 0 ? void 0 : _a.load();
+        });
+    }
+    unLinkControlPointToGroup(groupId, controlPointId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const groupChildren = yield this.getElementsLinkedToGroup(groupId);
+            for (const grpChild of groupChildren) {
+                const controlPoints = yield grpChild.getChildren('hasControlPoint');
+                if (controlPoints.find((cp) => { var _a; return ((_a = cp.info.referenceId) === null || _a === void 0 ? void 0 : _a.get()) === controlPointId; })) {
+                    yield spinal_env_viewer_graph_service_1.SpinalGraphService.removeChild(grpChild.id.get(), controlPointId, 'hasControlPoint', spinal_env_viewer_graph_service_1.SPINAL_RELATION_LST_PTR_TYPE);
+                }
+            }
+        });
     }
 }
 exports.default = SpinalGroup;

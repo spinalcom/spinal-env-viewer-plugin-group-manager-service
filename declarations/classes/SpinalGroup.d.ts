@@ -19,4 +19,6 @@ export default class SpinalGroup {
     private _isOldGroup;
     private _groupNameExist;
     private _getGroupRelation;
+    private loadControlPointLinked;
+    private unLinkControlPointToGroup;
 }
