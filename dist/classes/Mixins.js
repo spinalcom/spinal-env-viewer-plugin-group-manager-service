@@ -23,6 +23,7 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = applyMixins;
 function applyMixins(derivedCtor, baseCtors) {
     baseCtors.forEach(baseCtor => {
         Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
@@ -30,5 +31,4 @@ function applyMixins(derivedCtor, baseCtors) {
         });
     });
 }
-exports.default = applyMixins;
 //# sourceMappingURL=Mixins.js.map

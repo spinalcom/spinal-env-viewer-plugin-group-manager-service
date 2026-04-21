@@ -49,41 +49,44 @@ class SpinalCategory {
             let info = {
                 name: categoryName,
                 type: this.CATEGORY_TYPE,
-                icon: iconName
+                icon: iconName,
             };
             let childId = spinal_env_viewer_graph_service_1.SpinalGraphService.createNode(info, new spinal_core_connectorjs_type_1.Model({
-                name: categoryName
+                name: categoryName,
             }));
             return spinal_env_viewer_graph_service_1.SpinalGraphService.addChildInContext(contextId, childId, contextId, this.CONTEXT_TO_CATEGORY_RELATION, spinal_env_viewer_graph_service_1.SPINAL_RELATION_PTR_LST_TYPE);
         });
     }
     getCategories(nodeId) {
-        let nodeInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(nodeId);
-        if (this._isCategory(nodeInfo.type.get())) {
-            return Promise.resolve([nodeInfo]);
-        }
-        else if (this._isContext(nodeInfo.type.get())) {
-            return spinal_env_viewer_graph_service_1.SpinalGraphService.getChildren(nodeId, [this.CONTEXT_TO_CATEGORY_RELATION]);
-        }
-        else {
-            return this._getRelationRefs(nodeId).then(refs => {
-                let promises = refs.map(node => {
+        return __awaiter(this, void 0, void 0, function* () {
+            let nodeInfo = spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(nodeId);
+            if (this._isCategory(nodeInfo.type.get())) {
+                return Promise.resolve([nodeInfo]);
+            }
+            else if (this._isContext(nodeInfo.type.get())) {
+                return spinal_env_viewer_graph_service_1.SpinalGraphService.getChildren(nodeId, [
+                    this.CONTEXT_TO_CATEGORY_RELATION,
+                ]);
+            }
+            else {
+                const refs = yield this._getRelationRefs(nodeId);
+                let promises = refs.map((node) => {
                     return node.parent.load();
                 });
-                return Promise.all(promises).then((parents) => {
-                    return parents.map(el => {
-                        return spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(el.getId().get());
-                    });
+                const parents = yield Promise.all(promises);
+                return parents.map((el) => {
+                    return spinal_env_viewer_graph_service_1.SpinalGraphService.getInfo(el.getId().get());
                 });
-            });
-        }
+            }
+        });
     }
     elementIsInCategorie(categoryId, elementId) {
-        const realNode = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(categoryId);
-        return realNode.getChildren([constants_1.CATEGORY_TO_GROUP_RELATION]).then(children => {
+        return __awaiter(this, void 0, void 0, function* () {
+            const realNode = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(categoryId);
+            const children = yield realNode.getChildren([constants_1.CATEGORY_TO_GROUP_RELATION]);
             let itemFound = children.find((child) => {
                 const childrenIds = child.getChildrenIds();
-                return childrenIds.find(el => {
+                return childrenIds.find((el) => {
                     return el === elementId;
                 });
             });
@@ -105,7 +108,7 @@ class SpinalCategory {
                     }
                     else {
                         realNode.info.add_attr({
-                            [key]: value
+                            [key]: value,
                         });
                     }
                 }
@@ -145,6 +148,7 @@ class SpinalCategory {
                 if (name === categoryName)
                     return category;
             }
+            return undefined;
         });
     }
 }
