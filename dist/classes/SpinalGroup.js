@@ -163,17 +163,18 @@ class SpinalGroup {
     }
     deleteGroupFromGraph(groupId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const controlPoints = yield this.loadControlPointLinked(groupId);
-            if (!controlPoints)
+            const controlPointProfiles = yield this.loadControlPointProfileLinked(groupId);
+            if (!controlPointProfiles)
                 return;
             const unlinkPromises = [];
-            for (const controlPoint of controlPoints) {
-                spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(controlPoint);
-                unlinkPromises.push(this.unLinkControlPointToGroup(groupId, controlPoint.info.id.get()));
+            for (const controlPointProfile of controlPointProfiles) {
+                spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(controlPointProfile);
+                unlinkPromises.push(this.unLinkControlPointToGroup(groupId, controlPointProfile.info.id.get()));
             }
             yield Promise.all(unlinkPromises);
             const group = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(groupId);
             yield group.removeFromGraph();
+            controlPointProfiles.clear();
         });
     }
     _isGroup(type) {
@@ -245,7 +246,7 @@ class SpinalGroup {
         }
         return undefined;
     }
-    loadControlPointLinked(grpNodeId) {
+    loadControlPointProfileLinked(grpNodeId) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             const realNode = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(grpNodeId);
@@ -254,10 +255,10 @@ class SpinalGroup {
             return (_a = realNode.info.linkedItems) === null || _a === void 0 ? void 0 : _a.load();
         });
     }
-    unLinkControlPointToGroup(groupId, controlPointId) {
+    unLinkControlPointToGroup(groupId, controlPointProfileId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const controlPoint = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(controlPointId);
-            if (!controlPoint)
+            const controlPointProfile = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(controlPointProfileId);
+            if (!controlPointProfile)
                 return;
             const groupChildren = yield this.getElementsLinkedToGroup(groupId);
             for (const grpChild of groupChildren) {
@@ -265,7 +266,8 @@ class SpinalGroup {
                 if (!grpChildNode)
                     continue;
                 const controlPoints = yield grpChildNode.getChildren('hasControlPoint');
-                if (controlPoints.find((cp) => { var _a; return ((_a = cp.info.referenceId) === null || _a === void 0 ? void 0 : _a.get()) === controlPoint.info.id.get(); })) {
+                const controlPoint = controlPoints.find((cp) => { var _a; return ((_a = cp.info.referenceId) === null || _a === void 0 ? void 0 : _a.get()) === controlPointProfile.info.id.get(); });
+                if (controlPoint) {
                     yield grpChildNode.removeChild(controlPoint, 'hasControlPoint', spinal_env_viewer_graph_service_1.SPINAL_RELATION_LST_PTR_TYPE);
                 }
             }
