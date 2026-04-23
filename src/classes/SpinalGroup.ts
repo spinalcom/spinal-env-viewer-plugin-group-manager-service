@@ -244,18 +244,24 @@ export default class SpinalGroup {
   }
 
   public async deleteGroupFromGraph(groupId: string): Promise<void> {
-    const controlPoints = await this.loadControlPointLinked(groupId);
-    if (!controlPoints) return;
+    const controlPointProfiles = await this.loadControlPointProfileLinked(
+      groupId
+    );
+    if (!controlPointProfiles) return;
     const unlinkPromises: Promise<any>[] = [];
-    for (const controlPoint of controlPoints) {
-      SpinalGraphService._addNode(controlPoint);
+    for (const controlPointProfile of controlPointProfiles) {
+      SpinalGraphService._addNode(controlPointProfile);
       unlinkPromises.push(
-        this.unLinkControlPointToGroup(groupId, controlPoint.info.id.get())
+        this.unLinkControlPointToGroup(
+          groupId,
+          controlPointProfile.info.id.get()
+        )
       );
     }
     await Promise.all(unlinkPromises);
     const group = SpinalGraphService.getRealNode(groupId);
     await group.removeFromGraph();
+    controlPointProfiles.clear();
   }
 
   public _isGroup(type: string): boolean {
@@ -346,7 +352,7 @@ export default class SpinalGroup {
     return undefined;
   }
 
-  private async loadControlPointLinked(
+  private async loadControlPointProfileLinked(
     grpNodeId: string
   ): Promise<spinal.Lst<SpinalNode<any>> | undefined> {
     const realNode = SpinalGraphService.getRealNode(grpNodeId);
@@ -356,21 +362,22 @@ export default class SpinalGroup {
 
   private async unLinkControlPointToGroup(
     groupId: string,
-    controlPointId: string
+    controlPointProfileId: string
   ) {
-    const controlPoint = SpinalGraphService.getRealNode(controlPointId);
-    if (!controlPoint) return;
+    const controlPointProfile = SpinalGraphService.getRealNode(
+      controlPointProfileId
+    );
+    if (!controlPointProfile) return;
     const groupChildren = await this.getElementsLinkedToGroup(groupId);
     for (const grpChild of groupChildren) {
       const grpChildNode = SpinalGraphService.getRealNode(grpChild.id.get());
       if (!grpChildNode) continue;
       const controlPoints = await grpChildNode.getChildren('hasControlPoint');
-      if (
-        controlPoints.find(
-          (cp: SpinalNode) =>
-            cp.info.referenceId?.get() === controlPoint.info.id.get()
-        )
-      ) {
+      const controlPoint = controlPoints.find(
+        (cp: SpinalNode) =>
+          cp.info.referenceId?.get() === controlPointProfile.info.id.get()
+      );
+      if (controlPoint) {
         await grpChildNode.removeChild(
           controlPoint,
           'hasControlPoint',
